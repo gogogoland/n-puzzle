@@ -22,12 +22,11 @@ var (
 */
 
 type Sect struct {
+	Xinit, Yinit int32
 	Xsrc, Ysrc int32
 }
 
-var Piece = map[int]Sect{
-  1:{100, 200,},
-}
+var Piece = map[int]Sect{}
 
 /*
 ** Main function
