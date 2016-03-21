@@ -1,5 +1,9 @@
 package main
 
-func main() {
+import (
+  "ui"
+)
 
+func main() {
+  ui.Window()
 }
