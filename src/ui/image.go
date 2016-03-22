@@ -1,3 +1,8 @@
+/*
+** Charles Roy
+** croy@student.42.fr
+*/
+
 package ui
 
 import (
