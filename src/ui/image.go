@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"os"
+	"time"
 )
 
 func Load_image(renderer  *sdl.Renderer) int{
@@ -36,16 +37,33 @@ func TreatDataImageSrc(renderer *sdl.Renderer, texture *sdl.Texture) {
   for y, index := 1, 1; y <= puzzY; y++{
       for x := 1; x <= puzzX; x++{
         Piece[index] = Sect{ int32(winWidth * (x - 1) / puzzX),  int32(winHeight * (y - 1) / puzzY),
-					int32(winWidth * x / puzzX), int32(winHeight * y / puzzY) }
+					int32(divX), int32(divY) }
         index++
       }
   }
 	renderer.Clear()
-	src = sdl.Rect{Piece[1].Xinit, Piece[1].Yinit, Piece[1].Xsrc, Piece[1].Ysrc}
-	dst = sdl.Rect{int32(winWidth * 1 / puzzX), int32(winHeight *  1 / puzzY), Piece[1].Xsrc, Piece[1].Ysrc}
-	renderer.Copy(texture, &src, &dst)
-	renderer.Present()
-	renderer.Clear()
 	fmt.Println(Piece)
+
+//Test for random number
+	list := []int{9,7,5,3,4,2,8,1,6}
+//	list := []int{1,2,3,4,5,6,7,8,9}
+
+	for y, k := 1, 0; k < len(list); y++{
+		for x := 1; x <= puzzX; x++{
+			fmt.Println(k)
+			fmt.Println(Piece[list[k]])
+
+			src = sdl.Rect{Piece[list[k]].Xinit, Piece[list[k]].Yinit, Piece[list[k]].Xsrc, Piece[list[k]].Ysrc}
+			dst = sdl.Rect{int32(winWidth * (x - 1)/ puzzX), int32(winHeight *  (y - 1) / puzzY),
+				int32(divX), int32(divY)}
+
+			time.Sleep(400 * time.Millisecond)
+			fmt.Println(dst)
+			renderer.Copy(texture, &dst, &src)
+			renderer.Present()
+			renderer.Clear()
+			k++
+		}
+	}
   sdl.Delay(4000)
 }

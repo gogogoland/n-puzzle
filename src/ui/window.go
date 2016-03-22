@@ -14,6 +14,8 @@ var (
   puzzX, puzzY int = 3, 3
   winWidth, winHeight int = 1496, 1026
   imageName string = "assets/cat.bmp"
+	divX int = winWidth / puzzX
+	divY int = winHeight / puzzY
   err error
 )
 
@@ -25,8 +27,6 @@ type Sect struct {
 	Xinit, Yinit int32
 	Xsrc, Ysrc int32
 }
-
-var Piece = map[int]Sect{}
 
 /*
 ** Main function
