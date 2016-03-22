@@ -60,10 +60,10 @@ func TreatDataImageSrc(renderer *sdl.Renderer, texture *sdl.Texture) {
 			time.Sleep(400 * time.Millisecond)
 			fmt.Println(dst)
 			renderer.Copy(texture, &dst, &src)
-			renderer.Present()
-			renderer.Clear()
 			k++
 		}
 	}
+	renderer.Present()
+	renderer.Clear()
   sdl.Delay(4000)
 }
