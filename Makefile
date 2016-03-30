@@ -6,7 +6,7 @@
 #    By: croy <croy@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/03/15 16:41:50 by croy              #+#    #+#              #
-#    Updated: 2016/03/16 02:53:58 by croy             ###   ########.fr        #
+#    Updated: 2016/03/17 19:47:21 by tbalea           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ B_PKG = go build
 BIN = go install $(NAME)
 RM = rm -rf bin/$(NAME)
 
-PKGS =
+PKGS = algo
 
 all: $(NAME)
 
