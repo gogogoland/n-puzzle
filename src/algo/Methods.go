@@ -19,19 +19,21 @@ package algo
 //	Methods
 //	*	linked list for mouvement
 type Path struct {
-	x, y       int
-	next, prev *Path
+	x, y int
 }
 
 //	*	Puzzle composition and value of it
 type Tabl struct {
 	table [][]int
 	rang  int
+	g, h  int
 	from  int
+	cur   int
+	x, y  int
 }
 
 //	*	Slice of Tabl
-type List []Tabl
+type PrioQueue []Tabl
 
 //  *   Functions for method Path
 //  *   *   Add Path

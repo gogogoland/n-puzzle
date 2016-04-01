@@ -14,6 +14,7 @@ package algo
 
 import (
 	"container/heap"
+	"container/list"
 	"fmt"
 )
 
@@ -21,15 +22,16 @@ import (
 
 // An Tabl is a min-heap of ints.
 
-func (h List) Len() int           { return len(h) }
-func (h List) Less(i, j int) bool { return h[i].rang < h[j].rang }
-func (h List) Swap(i, j int)      { h[i].rang, h[j].rang = h[j].rang, h[i].rang }
+func (h PrioQueue) Len() int           { return len(h) }
+func (h PrioQueue) Less(i, j int) bool { return h[i].rang < h[j].rang }
+func (h PrioQueue) Swap(i, j int)      { h[i].rang, h[j].rang = h[j].rang, h[i].rang }
 
-func (h *List) Push(x interface{}) {
+func (h *PrioQueue) Push(x interface{}) {
 	*h = append(*h, Tabl{rang: x.(Tabl).rang, from: x.(Tabl).from})
 }
 
-func (h *List) Pop() interface{} {
+//	Get last elem and delete it
+func (h *PrioQueue) Pop() interface{} {
 	old := *h
 	n := len(old)
 	x := old[n-1]
@@ -43,7 +45,7 @@ func (h *List) Pop() interface{} {
 // This example inserts several ints into an Tabl, checks the minimum,
 // and removes them in order of priority.
 func TestHeap() {
-	h := &List{Tabl{rang: 2, from: 2}}
+	h := &PrioQueue{Tabl{rang: 2, from: 2}}
 	//tmp := Tabl{rang: []int{-1}}
 
 	heap.Init(h)
@@ -64,14 +66,33 @@ func TestHeap() {
 
 //	Functions
 //	*	Implementation of A*
-func Pathfinding(board, objtf [][]int, long, large, algo int) *Path {
-	open := &List{Tabl{rang: 0, from: 0, table: board}}
+func Pathfinding(board, objtf [][]int, long, large, algo int) *list.List {
+	open := &PrioQueue{Tabl{
+		rang:  0,
+		from:  0,
+		table: board,
+		cur:   0,
+		g:     0,
+		h:     0,
+		x:     0,
+		y:     0}}
+	(*open)[0].x, (*open)[0].y = MissPuzzle(board, long, large)
 	var tmp [4]Tabl
 	end := false
+	id := 0
 
 	//	Init Heap
 	heap.Init(open)
-	close := &List{Tabl{rang: 0, from: 0, table: objtf}}
+	close := &PrioQueue{Tabl{
+		rang:  0,
+		from:  0,
+		table: objtf,
+		cur:   0,
+		g:     0,
+		h:     0,
+		x:     0,
+		y:     0}}
+	(*close)[0].x, (*close)[0].y = MissPuzzle(objtf, long, large)
 	heap.Init(close)
 	end = false
 	for len(*open) > 0 && !end {
@@ -80,11 +101,11 @@ func Pathfinding(board, objtf [][]int, long, large, algo int) *Path {
 		//	Push current in close list (or Init close list with)
 		heap.Push(close, cur)
 		//	Find next path
-		//tmp := AlgoAStar(cur, long, large, algo)
+		tmp, id = AlgoAStar(cur.(Tabl), long, large, id, algo)
 		for i := 0; i < 4; i++ {
 			if tmp[i].rang > -1 {
 				//	Check if path exist already if so, check the fewest rang for the open list
-				if !CompareList(tmp[i], *close, long, large) && !CompareList(tmp[i], *open, long, large) {
+				if !ComparePrioQueue(tmp[i], *close, long, large) && !ComparePrioQueue(tmp[i], *open, long, large) {
 					heap.Push(open, tmp[i])
 				}
 				//	Check if it's final
@@ -94,28 +115,41 @@ func Pathfinding(board, objtf [][]int, long, large, algo int) *Path {
 			}
 		}
 	}
-	/*if end {
-		for close {
+	if end {
+		path := list.New()
+		i := 0
+		cur := heap.Pop(close).(Tabl)
+		path.PushFront(Path{x: cur.x, y: cur.y})
+		from := cur.from
+		for from != 0 {
 			//	add to list final
+			if (*close)[i].cur == from {
+				path.PushFront(Path{x: (*close)[i].x, y: (*close)[i].y})
+				i := 0
+				from = (*close)[i].from
+			}
 		}
-		return list
-	}*/
+		return path
+	}
 	return nil
 }
 
-//	*	Compare List
-func CompareList(tbl Tabl, lst List, long, large int) bool {
+//	*	ComparePrioQueue
+func ComparePrioQueue(tbl Tabl, lst PrioQueue, long, large int) bool {
 	max := len(lst)
 	for i := 0; i < max; i++ {
-		if CompareTable(tbl, lst[i], long, large) {
-			//	if equals, get the fewest rang
-			//	?	Maybe fix heap
-			//	?	Only to open list
-			if tbl.rang < lst[i].rang {
-				tbl.rang = lst[i].rang
-				tbl.from = lst[i].from
+		if tbl.h == lst[i].h {
+			if CompareTable(tbl, lst[i], long, large) {
+				//	if equals, get the fewest rang
+				//	?	Maybe fix heap
+				//	?	Only to open list
+				if tbl.g < lst[i].g {
+					lst[i].rang = tbl.rang
+					lst[i].from = tbl.from
+					lst[i].g = lst[i].g
+				}
+				return true
 			}
-			return true
 		}
 	}
 	return false
@@ -133,40 +167,79 @@ func CompareTable(b1, b2 Tabl, long, large int) bool {
 	return true
 }
 
+//	*	Find missing piece
+func MissPuzzle(board [][]int, long, large int) (int, int) {
+	x := 0
+	y := 0
+
+	for board[x][y] != long*large {
+		y := 0
+		for (board[x][y] != long*large) && (y < large) {
+			y++
+		}
+		x++
+	}
+	return x, y
+}
+
 //	*	Algorithme
-func AlgoAStar(cur Tabl, long, large, algo int) [4]Tabl {
+func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 	var path [4]Tabl
 	mx := 0
 	my := 0
 	i := 0
 
-	for cur.table[mx][my] != long*large {
-		for cur.table[mx][my] != long*large {
-			my++
-		}
-		mx++
-	}
+	mx, my = MissPuzzle(cur.table, long, large)
 	for x := -1; x < 2; x += 2 {
 		for y := -1; y < 2; y += 2 {
 			if (mx+x) < long && (mx+x) >= 0 && (my+y) >= 0 && (my+y) < large {
 				cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
-				//switch algo {
-				//case 0:
-				//	path[i] = Manahttan(cur)
-				//case 1:
-				//	path[i] = ALGO2(cur)
-				//case 2:
-				//	path[i] = ALGO3(cur)
+				switch algo {
+				case 0:
+					path[i] = Marecages(cur, long, large)
+					//case 1:
+					//	path[i] = Euclidien(cur, long, large)
+					//case 2:
+					//	path[i] = Manahttan(cur, long, large)
+				}
+				id++
+				path[i].cur, path[i].from = id, cur.cur
+				path[i].g = cur.g + 1
+				path[i].rang = path[i].g + path[i].h
+				path[i].x, path[i].y = mx+x, my+y
 				cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
 			}
 			i++
 		}
 	}
-	return path
+	return path, id
 }
 
 //	*	*	Manahttan
-//func Manahttan ()
+//	*	*	Euclidien
+//	*	*	Marecages
+func Marecages(cur Tabl, long, large int) Tabl {
+	res := Tabl{
+		rang:  cur.rang,
+		from:  0,
+		table: cur.table,
+		cur:   0,
+		g:     0,
+		h:     0,
+		x:     0,
+		y:     0}
+
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			tmpH := cur.table[x][y] - ((x + 1) + (y + 1))
+			if tmpH < 0 {
+				tmpH = -1 * tmpH
+			}
+			res.h += tmpH
+		}
+	}
+	return res
+}
 
 //	*	Set Table of Obstacle
 //			? Only one time ?
