@@ -5,5 +5,4 @@ import (
 )
 
 func main() {
-  ui.Window()
 }
