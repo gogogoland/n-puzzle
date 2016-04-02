@@ -1,3 +1,9 @@
+/* ROY CHARLES
+** croy@student.42.fr
+** France
+** N-Puzzle project
+*/
+
 package ui
 
 import (
@@ -5,6 +11,15 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 	"os"
 )
+
+
+type Puzzle struct {
+	Width, Height int
+}
+
+type Window struct {
+	Width, Height int
+}
 
 var (
 	window 		*sdl.Window
@@ -18,9 +33,16 @@ var (
 var (
 	winWidth, winHeight int = 1024, 764
 	winTitle string = "N-Puzzle"
+	imgWidth, imgHeight int = 1495, 1026
 	imgPuzzle string = "../assets/cat.bmp"
 )
 
+var (
+	Frame map[int]Puzzle
+	Win map[int]Window
+	Pwidth, Pheight int = 3, 3
+	PSurface = Pheight * Pwidth
+)
 
 //Main Function
 
@@ -30,7 +52,7 @@ func Ui() int{
 	window, err = sdl.CreateWindow(winTitle, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		winWidth, winHeight, sdl.WINDOW_SHOWN)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create window: %s\n", err)
+		fmt.Fprintf(os.Stderr, "ERROR. Failed to create window: %s\n", err)
 		return 1
 	}
 	//Destroy Window
@@ -40,7 +62,7 @@ func Ui() int{
 	//Init Render
 	renderer, err = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", err)
+		fmt.Fprintf(os.Stderr, "ERROR. Failed to create renderer: %s\n", err)
 		return 2
 	}
 	//Destroy Render
@@ -48,7 +70,7 @@ func Ui() int{
 
 	image, err = sdl.LoadBMP(imgPuzzle)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to load BMP: %s\n", err)
+		fmt.Fprintf(os.Stderr, "ERROR. Failed to load BMP: %s\n", err)
 		return 3
 	}
 	defer image.Free()
@@ -56,25 +78,28 @@ func Ui() int{
 	//Init Img for Puzzle
 	texture, err = renderer.CreateTextureFromSurface(image)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create texture: %s\n", err)
+		fmt.Fprintf(os.Stderr, "ERROR. Failed to create texture: %s\n", err)
 		return 4
 	}
 	//Destroy img for Puzzle
 	defer texture.Destroy()
 
+	SeparateFrameInMap()
 	//Draw Puzzle
-	Draw()
+	DrawPuzzle()
 
 	sdl.Delay(4000)
 
 	return 0
 }
 
-func Draw(){
-	src = sdl.Rect{0, 0, 1495, 1026}
-	dst = sdl.Rect{0, 0, int32(winWidth), int32(winHeight)}
-
+func DrawPuzzle(){
 	renderer.Clear()
+	src = sdl.Rect{1495 - 498, 342 - 342, int32(1495), int32(342)}
+	dst = sdl.Rect{341, 254, int32(341), int32(254)}
+	renderer.Copy(texture, &src, &dst)
+	src = sdl.Rect{996 - 498, 342 - 342, int32(996), int32(342)}
+	dst = sdl.Rect{682, 509, int32(341), int32(254)}
 
 	renderer.Copy(texture, &src, &dst)
 	renderer.Present()
