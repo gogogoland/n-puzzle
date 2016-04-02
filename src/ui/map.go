@@ -1,10 +1,17 @@
+/* ROY CHARLES
+** croy@student.42.fr
+** France
+** N-Puzzle project
+*/
+
 package ui
 
 import (
 	"fmt"
 )
 
-func SeparateFrameInMap(){
+//Get Size of each frame of puzzle
+func SeparateImgInMap(){
 	Frame = make(map[int]Puzzle)
 	Win = make(map[int]Window)
 	x, y, i, min := 1, 1, 1, 0

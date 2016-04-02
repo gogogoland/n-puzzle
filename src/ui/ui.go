@@ -84,7 +84,7 @@ func Ui() int{
 	//Destroy img for Puzzle
 	defer texture.Destroy()
 
-	SeparateFrameInMap()
+	SeparateImgInMap()
 	//Draw Puzzle
 	DrawPuzzle()
 
