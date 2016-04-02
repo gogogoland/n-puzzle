@@ -16,9 +16,9 @@ var (
 )
 
 var (
-	winWidth, winHeight int = 800, 600
+	winWidth, winHeight int = 1024, 764
 	winTitle string = "N-Puzzle"
-	imgName string = "../assets/cat.bmp"
+	imgPuzzle string = "../assets/cat.bmp"
 )
 
 
@@ -46,27 +46,24 @@ func Ui() int{
 	//Destroy Render
 	defer renderer.Destroy()
 
-	image, err = sdl.LoadBMP(imgName)
+	image, err = sdl.LoadBMP(imgPuzzle)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to load BMP: %s\n", err)
 		return 3
 	}
 	defer image.Free()
 
+	//Init Img for Puzzle
 	texture, err = renderer.CreateTextureFromSurface(image)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create texture: %s\n", err)
 		return 4
 	}
+	//Destroy img for Puzzle
 	defer texture.Destroy()
 
-	src = sdl.Rect{0, 0, 1495, 1026}
-	dst = sdl.Rect{0, 0, 800, 600}
-
-	renderer.Clear()
-
-	renderer.Copy(texture, &src, &dst)
-	renderer.Present()
+	//Draw Puzzle
+	Draw()
 
 	sdl.Delay(4000)
 
@@ -74,5 +71,11 @@ func Ui() int{
 }
 
 func Draw(){
+	src = sdl.Rect{0, 0, 1495, 1026}
+	dst = sdl.Rect{0, 0, int32(winWidth), int32(winHeight)}
 
+	renderer.Clear()
+
+	renderer.Copy(texture, &src, &dst)
+	renderer.Present()
 }
