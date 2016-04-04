@@ -216,7 +216,9 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 }
 
 //	*	*	Manahttan
+
 //	*	*	Euclidien
+
 //	*	*	Marecages
 func Marecages(cur Tabl, long, large int) Tabl {
 	res := Tabl{
@@ -231,7 +233,11 @@ func Marecages(cur Tabl, long, large int) Tabl {
 
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
-			tmpH := cur.table[x][y] - ((x + 1) + (y + 1))
+			if cur.table[x][y] == 0 {
+				tmpH := ((long / 2) + (long*large)/2) - ((x + 1) + (y * large))
+			} else {
+				tmpH := cur.table[x][y] - ((x + 1) + (y * large))
+			}
 			if tmpH < 0 {
 				tmpH = -1 * tmpH
 			}
