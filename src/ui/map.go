@@ -17,72 +17,64 @@ func SeparateImgInMap(){
 	x, y, i, min := 1, 1, 1, 0
 
 	for i < PSurface{
-		for x < (Pwidth - min){
+		for x <= (Pwidth - min) && i <= PSurface {
 			Frame[i] = Puzzle{
-				(x * imgWidth / 3),
-				(y * imgHeight / 3),
+				(x * imgWidth / Pwidth),
+				(y * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				((x - 1) * winWidth / 3),
-				((y - 1) * winHeight / 3),
+				(x * winWidth / Pwidth),
+				(y * winHeight / Pheight),
 			}
 			//Debug
-			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, Min : ", x, y, min)
+			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, ", x, y)
 			x++
 			i++
 		}
-		for y < (Pheight - min){
+		x--
+		for y + 1 <= (Pheight - min) && i <= PSurface {
+			y++
 			Frame[i] = Puzzle{
 				(x * imgWidth / Pwidth),
 				(y * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				((x - 1) * winWidth / Pwidth),
-				((y - 1) * winHeight / Pheight),
+				(x * winWidth / Pwidth),
+				(y * winHeight / Pheight),
 			}
 			//Debug
-			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, Min : ", x, y, min)
-			y++
+			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, ", x, y)
 			i++
 		}
-		for x > min + 1{
+		for x - 1 > min && i <= PSurface {
+			x--
 			Frame[i] = Puzzle{
 				(x * imgWidth / Pwidth),
 				(y * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				((x - 1) * winWidth / Pwidth),
-				((y - 1) * winHeight / Pheight),
+				(x * winWidth / Pwidth),
+				(y * winHeight / Pheight),
 			}
 			//Debug
-			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, Min : ", x, y, min)
-			x--
+			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
 			i++
 		}
 		min++
-		for y > min + 1{
+		for y - 1 > min && i <= PSurface {
+			y--
 			Frame[i] = Puzzle{
 				(x * imgWidth / Pwidth),
 				(y * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				((x - 1) * winWidth / Pwidth),
-				((y - 1) * winHeight / Pheight),
+				(x * winWidth / Pwidth),
+				(y * winHeight / Pheight),
 			}
 			//Debug
-			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, Min : ", x, y, min)
-			y--
+			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
 			i++
 		}
+		x++
 	}
-	//ADD the last Frame here.
-	Frame[PSurface] = Puzzle{
-		(x * imgWidth / Pwidth),
-		(y * imgHeight / Pheight),
-	}
-	Win[PSurface] = Window{
-		((x - 1) * winWidth / Pwidth),
-		((y - 1) * winHeight / Pheight),
-	}
-	fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, Min : ", x, y, min)
 }
