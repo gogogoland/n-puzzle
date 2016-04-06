@@ -40,7 +40,7 @@ var (
 var (
 	Frame map[int]Puzzle
 	Win map[int]Window
-	Pwidth, Pheight int = 14, 16
+	Pwidth, Pheight int = 3, 5
 	PSurface = Pheight * Pwidth
 )
 
@@ -91,16 +91,4 @@ func Ui() int{
 	sdl.Delay(4000)
 
 	return 0
-}
-
-func DrawPuzzle(){
-	renderer.Clear()
-	src = sdl.Rect{1495 - 498, 342 - 342, int32(1495), int32(342)}
-	dst = sdl.Rect{341, 254, int32(341), int32(254)}
-	renderer.Copy(texture, &src, &dst)
-	src = sdl.Rect{996 - 498, 342 - 342, int32(996), int32(342)}
-	dst = sdl.Rect{0, 0, int32(341), int32(254)}
-
-	renderer.Copy(texture, &src, &dst)
-	renderer.Present()
 }
