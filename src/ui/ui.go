@@ -27,20 +27,21 @@ var (
 	texture 	*sdl.Texture
 	image 		*sdl.Surface
 	src, dst 	sdl.Rect
+	rect 			sdl.Rect
 	err 		error
 )
 
 var (
 	winWidth, winHeight int = 1024, 764
 	winTitle string = "N-Puzzle"
-	imgWidth, imgHeight int = 1495, 1026
+	imgWidth, imgHeight int = 1500, 1025
 	imgPuzzle string = "../assets/cat.bmp"
 )
 
 var (
 	Frame map[int]Puzzle
 	Win map[int]Window
-	Pwidth, Pheight int = 3, 5
+	Pwidth, Pheight int = 5, 5
 	PSurface = Pheight * Pwidth
 )
 

@@ -19,12 +19,12 @@ func SeparateImgInMap(){
 	for i < PSurface{
 		for x <= (Pwidth - min) && i <= PSurface {
 			Frame[i] = Puzzle{
-				(x * imgWidth / Pwidth),
-				(y * imgHeight / Pheight),
+				((x - 1) * imgWidth / Pwidth),
+				((y - 1) * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				(x * winWidth / Pwidth),
-				(y * winHeight / Pheight),
+				((x - 1) * winWidth / Pwidth),
+				((y - 1) * winHeight / Pheight),
 			}
 			//Debug
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, ", x, y)
@@ -35,12 +35,12 @@ func SeparateImgInMap(){
 		for y + 1 <= (Pheight - min) && i <= PSurface {
 			y++
 			Frame[i] = Puzzle{
-				(x * imgWidth / Pwidth),
-				(y * imgHeight / Pheight),
+				((x - 1) * imgWidth / Pwidth),
+				((y - 1) * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				(x * winWidth / Pwidth),
-				(y * winHeight / Pheight),
+				((x - 1) * winWidth / Pwidth),
+				((y - 1) * winHeight / Pheight),
 			}
 			//Debug
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, ", x, y)
@@ -49,12 +49,12 @@ func SeparateImgInMap(){
 		for x - 1 > min && i <= PSurface {
 			x--
 			Frame[i] = Puzzle{
-				(x * imgWidth / Pwidth),
-				(y * imgHeight / Pheight),
+				((x - 1) * imgWidth / Pwidth),
+				((y - 1) * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				(x * winWidth / Pwidth),
-				(y * winHeight / Pheight),
+				((x - 1) * winWidth / Pwidth),
+				((y - 1) * winHeight / Pheight),
 			}
 			//Debug
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
@@ -64,12 +64,12 @@ func SeparateImgInMap(){
 		for y - 1 > min && i <= PSurface {
 			y--
 			Frame[i] = Puzzle{
-				(x * imgWidth / Pwidth),
-				(y * imgHeight / Pheight),
+				((x - 1) * imgWidth / Pwidth),
+				((y - 1) * imgHeight / Pheight),
 			}
 			Win[i] = Window{
-				(x * winWidth / Pwidth),
-				(y * winHeight / Pheight),
+				((x - 1) * winWidth / Pwidth),
+				((y - 1) * winHeight / Pheight),
 			}
 			//Debug
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
