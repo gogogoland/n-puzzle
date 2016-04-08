@@ -71,24 +71,27 @@ func Ui() int{
 	//Destroy Render
 	defer renderer.Destroy()
 
+	//Init Img for Puzzle
 	image, err = sdl.LoadBMP(imgPuzzle)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR. Failed to load BMP: %s\n", err)
 		return 3
 	}
+	//Destroy img for Puzzle
 	defer image.Free()
 
-	//Init Img for Puzzle
+
 	texture, err = renderer.CreateTextureFromSurface(image)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR. Failed to create texture: %s\n", err)
 		return 4
 	}
-	//Destroy img for Puzzle
 	defer texture.Destroy()
 
+	//algo to get size of each piece of the puzzle
 	SeparateImgInMap()
-	//Draw Puzzle
+	
+	//Draw Puzzle and event
 	DrawPuzzle()
 
 	return 0
