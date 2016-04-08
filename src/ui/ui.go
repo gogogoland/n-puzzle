@@ -26,6 +26,8 @@ var (
 	renderer 	*sdl.Renderer
 	texture 	*sdl.Texture
 	image 		*sdl.Surface
+	event			sdl.Event
+	running 	bool
 	src, dst 	sdl.Rect
 	rect 			sdl.Rect
 	err 		error
@@ -34,14 +36,14 @@ var (
 var (
 	winWidth, winHeight int = 1024, 764
 	winTitle string = "N-Puzzle"
-	imgWidth, imgHeight int = 1500, 1025
+	imgWidth, imgHeight int = 1500, 1000
 	imgPuzzle string = "../assets/cat.bmp"
 )
 
 var (
 	Frame map[int]Puzzle
 	Win map[int]Window
-	Pwidth, Pheight int = 5, 5
+	Pwidth, Pheight int = 5, 8
 	PSurface = Pheight * Pwidth
 )
 
@@ -88,8 +90,6 @@ func Ui() int{
 	SeparateImgInMap()
 	//Draw Puzzle
 	DrawPuzzle()
-
-	sdl.Delay(4000)
 
 	return 0
 }

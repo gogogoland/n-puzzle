@@ -77,4 +77,14 @@ func SeparateImgInMap(){
 		}
 		x++
 	}
+	if PSurface % 2 == 1 && Pwidth == Pheight{
+			Frame[i] = Puzzle{
+				((x - 1) * imgWidth / Pwidth),
+				((y - 1) * imgHeight / Pheight),
+			}
+			Win[i] = Window{
+				((x - 1) * winWidth / Pwidth),
+				((y - 1) * winHeight / Pheight),
+			}
+		}
 }
