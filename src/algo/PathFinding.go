@@ -18,6 +18,8 @@ import (
 	"fmt"
 )
 
+var obv int
+
 //	TEST HEAP
 
 // An Tabl is a min-heap of ints.
@@ -65,36 +67,50 @@ func TestHeap() {
  */
 
 //	Functions
-//	*	Implementation of A*
-func Pathfinding(board, objtf [][]int, long, large, algo int) *list.List {
-	open := &PrioQueue{Tabl{
+//	*	Set Waited board
+func SetObjectifBoard(long, large int) [][]int {
+	x, y, i := 0, 0, 1
+	objtf := make([][]int, long)
+	for x < long {
+		objtf[x] = make([]int, large)
+		for y < large {
+			objtf[x][y] = i
+			i++
+			y++
+		}
+		x++
+	}
+	return (objtf)
+}
+
+//	*	Initialise Heap List
+func InitHeapList(board [][]int, long, large int) *PrioQueue {
+	lx, ly := MissPuzzle(board, long, large)
+	queue := &PrioQueue{Tabl{
 		rang:  0,
 		from:  0,
 		table: board,
 		cur:   0,
 		g:     0,
 		h:     0,
-		x:     0,
-		y:     0}}
-	(*open)[0].x, (*open)[0].y = MissPuzzle(board, long, large)
+		x:     lx,
+		y:     ly}}
+	return queue
+}
+
+//	*	Implementation of A*
+func Pathfinding(board [][]int, long, large, algo int) *list.List {
+	obv := MissingValue(long, large)
+	objtf := SetObjectifBoard(long, large)
+	open := InitHeapList(board, long, large)
+	close := InitHeapList(objtf, long, large)
 	var tmp [4]Tabl
 	end := false
 	id := 0
 
 	//	Init Heap
 	heap.Init(open)
-	close := &PrioQueue{Tabl{
-		rang:  0,
-		from:  0,
-		table: objtf,
-		cur:   0,
-		g:     0,
-		h:     0,
-		x:     0,
-		y:     0}}
-	(*close)[0].x, (*close)[0].y = MissPuzzle(objtf, long, large)
 	heap.Init(close)
-	end = false
 	for len(*open) > 0 && !end {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
@@ -172,12 +188,14 @@ func MissPuzzle(board [][]int, long, large int) (int, int) {
 	x := 0
 	y := 0
 
-	for board[x][y] != long*large {
+	for board[x][y] != obv {
 		y := 0
-		for (board[x][y] != long*large) && (y < large) {
+		for (board[x][y] != obv) && (y < large) {
 			y++
 		}
-		x++
+		if board[x][y] != obv {
+			x++
+		}
 	}
 	return x, y
 }
@@ -230,13 +248,14 @@ func Marecages(cur Tabl, long, large int) Tabl {
 		h:     0,
 		x:     0,
 		y:     0}
+	tmpH := 0
 
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
 			if cur.table[x][y] == 0 {
-				tmpH := ((long / 2) + (long*large)/2) - ((x + 1) + (y * large))
+				tmpH = ((long / 2) + (long*large)/2) - ((x + 1) + (y * large))
 			} else {
-				tmpH := cur.table[x][y] - ((x + 1) + (y * large))
+				tmpH = cur.table[x][y] - ((x + 1) + (y * large))
 			}
 			if tmpH < 0 {
 				tmpH = -1 * tmpH
