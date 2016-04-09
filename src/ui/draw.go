@@ -10,7 +10,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func DrawPuzzle(){
+func DrawPuzzle(array []int){
 	running = true
 
 	for running {
@@ -24,7 +24,7 @@ func DrawPuzzle(){
 		renderer.Clear()
 
 		for i := 1; i <= PSurface; i++ {
-			src = sdl.Rect{int32(Frame[i].Width), int32(Frame[i].Height),
+			src = sdl.Rect{int32(Frame[array[i - 1]].Width), int32(Frame[array[i - 1]].Height),
 				int32(imgWidth/Pwidth), int32(imgHeight/Pheight)}
 			dst = sdl.Rect{int32(Win[i].Width + 1), int32(Win[i].Height + 1),
 				 int32(winWidth/Pwidth - 1), int32(winHeight/Pheight - 1)}

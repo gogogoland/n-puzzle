@@ -43,13 +43,15 @@ var (
 var (
 	Frame map[int]Puzzle
 	Win map[int]Window
-	Pwidth, Pheight int = 5, 8
+	Pwidth, Pheight int = 3, 3
 	PSurface = Pheight * Pwidth
 )
 
 //Main Function
 
 func Ui() int{
+	//debug tmp array
+	array := []int{1, 4, 5, 6, 7, 8, 9, 3, 2}
 
 	//Init Window
 	window, err = sdl.CreateWindow(winTitle, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
@@ -90,9 +92,9 @@ func Ui() int{
 
 	//algo to get size of each piece of the puzzle
 	SeparateImgInMap()
-	
-	//Draw Puzzle and event
-	DrawPuzzle()
+
+	//Draw Puzzle and event with an array of int 
+	DrawPuzzle(array)
 
 	return 0
 }

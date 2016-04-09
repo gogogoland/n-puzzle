@@ -86,5 +86,6 @@ func SeparateImgInMap(){
 				((x - 1) * winWidth / Pwidth),
 				((y - 1) * winHeight / Pheight),
 			}
+			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
 		}
 }
