@@ -16,6 +16,7 @@ import (
 	"container/heap"
 	"container/list"
 	"fmt"
+	"math"
 )
 
 //	TEST HEAP
@@ -65,37 +66,6 @@ func TestHeap() {
  */
 
 //	Functions
-//	*	Set Waited board
-func SetObjectifBoard(long, large int) [][]int {
-	x, y, i := 0, 0, 1
-	objtf := make([][]int, long)
-	for x < long {
-		objtf[x] = make([]int, large)
-		for y < large {
-			objtf[x][y] = i
-			i++
-			y++
-		}
-		x++
-	}
-	return (objtf)
-}
-
-//	*	Initialise Heap List
-func InitHeapList(board [][]int, long, large int) *PrioQueue {
-	lx, ly := MissPuzzle(board, long, large)
-	queue := &PrioQueue{Tabl{
-		rang:  0,
-		from:  0,
-		table: board,
-		cur:   0,
-		g:     0,
-		h:     0,
-		x:     lx,
-		y:     ly}}
-	return queue
-}
-
 //	*	Implementation of A*
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	SaveSnail(board, long, large)
@@ -134,12 +104,14 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 		path := list.New()
 		i := 0
 		cur := heap.Pop(close).(Tabl)
-		path.PushFront(Path{x: cur.x, y: cur.y})
+		ConvertToSnail(cur.table, long, large)
+		path.PushFront(Path{table: cur.table})
 		from := cur.from
 		for from != 0 {
 			//	add to list final
 			if (*close)[i].cur == from {
-				path.PushFront(Path{x: (*close)[i].x, y: (*close)[i].y})
+				ConvertToSnail((*close)[i].table, long, large)
+				path.PushFront(Path{table: (*close)[i].table})
 				i := 0
 				from = (*close)[i].from
 			}
@@ -149,15 +121,53 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	return nil
 }
 
+//	*	Set Waited board
+func SetObjectifBoard(long, large int) [][]int {
+	x, y, i := 0, 0, 1
+	objtf := make([][]int, long)
+	for x < long {
+		objtf[x] = make([]int, large)
+		for y < large {
+			objtf[x][y] = i
+			i++
+			y++
+		}
+		x++
+	}
+	return (objtf)
+}
+
+//	*	Initialise Heap List
+func InitHeapList(board [][]int, long, large int) *PrioQueue {
+	x, y := MissPuzzle(board, long, large)
+	queue := &PrioQueue{InitTable(board, x, y)}
+	return queue
+}
+
+//	*	Initialise Table content
+func InitTable(board [][]int, x, y int) Tabl {
+	tabl := Tabl{
+		rang:  0,
+		from:  0,
+		table: board,
+		cur:   0,
+		g:     0,
+		h:     0,
+		x:     x,
+		y:     y}
+	return tabl
+}
+
 //	*	ComparePrioQueue
 func ComparePrioQueue(tbl Tabl, lst PrioQueue, long, large int) bool {
 	max := len(lst)
 	for i := 0; i < max; i++ {
+		//	First compare if same value of table
 		if tbl.h == lst[i].h {
 			if CompareTable(tbl, lst[i], long, large) {
 				//	if equals, get the fewest rang
 				//	?	Maybe fix heap
-				//	?	Only to open list
+				//	?	Is only to open list ?
 				if tbl.g < lst[i].g {
 					lst[i].rang = tbl.rang
 					lst[i].from = tbl.from
@@ -213,17 +223,14 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 				cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
 				switch algo {
 				case 0:
-					path[i] = Marecages(cur, long, large)
-					//case 1:
-					//	path[i] = Euclidien(cur, long, large)
-					//case 2:
-					//	path[i] = Manahttan(cur, long, large)
+					path[i] = Marecages(cur, long, large, mx+x, my+y, cur.g+1)
+				case 1:
+					path[i] = Euclidien(cur, long, large, mx+x, my+y, cur.g+1)
+				case 2:
+					path[i] = Manahttan(cur, long, large, mx+x, my+y, cur.g+1)
 				}
 				id++
 				path[i].cur, path[i].from = id, cur.cur
-				path[i].g = cur.g + 1
-				path[i].rang = path[i].g + path[i].h
-				path[i].x, path[i].y = mx+x, my+y
 				cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
 			}
 			i++
@@ -233,35 +240,71 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 }
 
 //	*	*	Manahttan
+func Manahttan(cur Tabl, long, large, mx, my, g int) Tabl {
+	res := InitTable(cur.table, mx, my)
+	tmpHy := 0
+	tmpHx := 0
 
-//	*	*	Euclidien
-
-//	*	*	Marecages
-func Marecages(cur Tabl, long, large int) Tabl {
-	res := Tabl{
-		rang:  cur.rang,
-		from:  0,
-		table: cur.table,
-		cur:   0,
-		g:     0,
-		h:     0,
-		x:     0,
-		y:     0}
-	tmpH := 0
-
+	res.g = g
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
-			if cur.table[x][y] == 0 {
-				tmpH = ((long / 2) + (long*large)/2) - ((x + 1) + (y * large))
-			} else {
-				tmpH = cur.table[x][y] - ((x + 1) + (y * large))
+			tmpHy = (cur.table[x][y] % large) - y
+			if tmpHy < 0 {
+				tmpHy = -1 * tmpHy
 			}
+			tmpHx = (cur.table[x][y] / large) - x
+			if tmpHx < 0 {
+				tmpHx = -1 * tmpHx
+			}
+			res.h += tmpHx + tmpHy
+		}
+	}
+	res.rang = res.g + res.h
+	return res
+}
+
+//	*	*	Euclidien
+func Euclidien(cur Tabl, long, large, mx, my, g int) Tabl {
+	res := InitTable(cur.table, mx, my)
+	tmpHy := 0
+	tmpHx := 0
+	tmpH := 0.0
+
+	res.g = g
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			tmpHy = (cur.table[x][y] % large) - y
+			if tmpHy < 0 {
+				tmpHy = -1 * tmpHy
+			}
+			tmpHx = (cur.table[x][y] / large) - x
+			if tmpHx < 0 {
+				tmpHx = -1 * tmpHx
+			}
+			tmpH = (float64(tmpHx) + float64(tmpHy)) * (float64(tmpHy) + float64(tmpHx))
+			res.h += int(math.Sqrt(tmpH))
+		}
+	}
+	res.rang = res.g + res.h
+	return res
+}
+
+//	*	*	Marecages
+func Marecages(cur Tabl, long, large, mx, my, g int) Tabl {
+	res := InitTable(cur.table, mx, my)
+	tmpH := 0
+
+	res.g = g
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			tmpH = cur.table[x][y] - ((x + 1) + (y * large))
 			if tmpH < 0 {
 				tmpH = -1 * tmpH
 			}
 			res.h += tmpH
 		}
 	}
+	res.rang = res.g + res.h
 	return res
 }
 

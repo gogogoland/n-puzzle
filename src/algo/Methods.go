@@ -19,7 +19,8 @@ package algo
 //	Methods
 //	*	linked list for mouvement
 type Path struct {
-	x, y int
+	table [][]int
+	x, y  int
 }
 
 //	*	Puzzle composition and value of it

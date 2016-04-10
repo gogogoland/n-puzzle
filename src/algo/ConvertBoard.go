@@ -20,6 +20,7 @@ var (
 
 //	Functions
 //	*	Mapping snails value Amd save missing value
+//	*	*	TO TEST
 func SaveSnail(board [][]int, long, large int) {
 	x, y := 0, 0
 	i, min, max := 1, 0, long*large
