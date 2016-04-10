@@ -19,7 +19,8 @@ package algo
 //	Methods
 //	*	linked list for mouvement
 type Path struct {
-	x, y int
+	x, y  int
+	board [][]int
 }
 
 //	*	Puzzle composition and value of it
@@ -34,6 +35,60 @@ type Tabl struct {
 
 //	*	Slice of Tabl
 type PrioQueue []Tabl
+
+//	*	Initialise Table
+func InitTable(board [][]int, x, y int) Tabl {
+	table := Tabl{
+		rang:  0,
+		from:  0,
+		table: board,
+		cur:   0,
+		g:     0,
+		h:     0,
+		x:     x,
+		y:     y}
+	return table
+}
+
+//	*	Initialise Heap List
+func InitHeapList(board [][]int, long, large int) *PrioQueue {
+	lx, ly := MissPuzzle(board, long, large)
+	queue := &PrioQueue{InitTable(board, lx, ly)}
+	return queue
+}
+
+//	*	ComparePrioQueue
+func ComparePrioQueue(tbl Tabl, lst PrioQueue, long, large int) bool {
+	max := len(lst)
+	for i := 0; i < max; i++ {
+		if tbl.h == lst[i].h {
+			if CompareTable(tbl, lst[i], long, large) {
+				//	if equals, get the fewest rang
+				//	?	Maybe fix heap
+				//	?	Only to open list
+				if tbl.g < lst[i].g {
+					lst[i].rang = tbl.rang
+					lst[i].from = tbl.from
+					lst[i].g = lst[i].g
+				}
+				return true
+			}
+		}
+	}
+	return false
+}
+
+//	*	Compare table
+func CompareTable(b1, b2 Tabl, long, large int) bool {
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			if b1.table[x][y] != b2.table[x][y] {
+				return false
+			}
+		}
+	}
+	return true
+}
 
 //  *   Functions for method Path
 //  *   *   Add Path
