@@ -30,7 +30,7 @@ var (
 	running 	bool
 	src, dst 	sdl.Rect
 	rect 			sdl.Rect
-	err 		error
+	err 			error
 )
 
 var (
@@ -51,7 +51,7 @@ var (
 
 func Ui() int{
 	//debug tmp array
-	array := []int{1, 4, 5, 6, 7, 8, 9, 3, 2}
+	test := [][]int{{1, 4, 5, 6, 7, 8, 9, 3, 2}, {1, 7, 5, 6, 4, 8, 9, 2, 3}}
 
 	//Init Window
 	window, err = sdl.CreateWindow(winTitle, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
@@ -93,8 +93,8 @@ func Ui() int{
 	//algo to get size of each piece of the puzzle
 	SeparateImgInMap()
 
-	//Draw Puzzle and event with an array of int 
-	DrawPuzzle(array)
+	//Draw Puzzle and event with an array of int
+	DrawPuzzle(test)
 
 	return 0
 }
