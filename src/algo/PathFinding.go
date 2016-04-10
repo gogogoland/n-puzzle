@@ -18,8 +18,6 @@ import (
 	"fmt"
 )
 
-var obv int
-
 //	TEST HEAP
 
 // An Tabl is a min-heap of ints.
@@ -100,7 +98,8 @@ func InitHeapList(board [][]int, long, large int) *PrioQueue {
 
 //	*	Implementation of A*
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
-	obv := MissingValue(long, large)
+	SaveSnail(board, long, large)
+	ConvertToRight(board, long, large)
 	objtf := SetObjectifBoard(long, large)
 	open := InitHeapList(board, long, large)
 	close := InitHeapList(objtf, long, large)
