@@ -14,13 +14,12 @@ func DrawPuzzle(array []int){
 	running = true
 
 	for running {
-		event = sdl.PollEvent()
-
-		switch event.(type) {
-		case *sdl.QuitEvent:
-			running = false
+		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+			switch event.(type) {
+			case *sdl.QuitEvent:
+				running = false
+			}
 		}
-
 		renderer.Clear()
 
 		for i := 1; i <= PSurface; i++ {
