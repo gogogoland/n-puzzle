@@ -8,8 +8,8 @@ package ui
 
 import (
 	"fmt"
-	"github.com/veandco/go-sdl2/sdl"
 	"os"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 
@@ -43,15 +43,12 @@ var (
 var (
 	Frame map[int]Puzzle
 	Win map[int]Window
-	Pwidth, Pheight int = 3, 3
-	PSurface = Pheight * Pwidth
 )
 
 //Main Function
 
-func Ui() int{
-	//debug tmp array
-	test := [][]int{{1, 4, 5, 6, 7, 8, 9, 3, 2}, {1, 7, 5, 6, 4, 8, 9, 2, 3}}
+func Ui(array [][]int, Pwid, Phei int) int{
+	Pwidth, Pheight := Pwid, Phei
 
 	//Init Window
 	window, err = sdl.CreateWindow(winTitle, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
@@ -91,10 +88,10 @@ func Ui() int{
 	defer texture.Destroy()
 
 	//algo to get size of each piece of the puzzle
-	SeparateImgInMap()
+	SeparateImgInMap(Pwidth, Pheight)
 
 	//Draw Puzzle and event with an array of int
-	DrawPuzzle(test)
+	DrawPuzzle(array, Pwidth, Pheight)
 
 	return 0
 }

@@ -11,7 +11,8 @@ import (
 )
 
 //Get Size of each frame of puzzle
-func SeparateImgInMap(){
+func SeparateImgInMap(Pwidth, Pheight int){
+	PSurface := Pheight * Pwidth
 	Frame = make(map[int]Puzzle)
 	Win = make(map[int]Window)
 	x, y, i, min := 1, 1, 1, 0

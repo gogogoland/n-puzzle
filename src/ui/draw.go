@@ -12,9 +12,10 @@ import (
 )
 
 //Take an [][]array of int and draw while it's not the end.
-func DrawPuzzle(array [][]int){
-	running = true
+func DrawPuzzle(array [][]int, Pwidth, Pheight int){
+	running := true
 	solve := 1
+	PSurface := Pheight * Pwidth
 
 	for running {
 		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
