@@ -32,15 +32,22 @@ func DrawPuzzle(array [][]int, Pwidth, Pheight int){
 			renderer.FillRect(&rect)
 
 			for i := 1; i <= PSurface; i++ {
-				if (array[j][i] != PSurface) {
-				src = sdl.Rect{int32(Frame[array[j][i - 1]].Width), int32(Frame[array[j][i - 1]].Height),
-					int32(imgWidth/Pwidth), int32(imgHeight/Pheight)}
-				dst = sdl.Rect{int32(Win[i].Width + 1), int32(Win[i].Height + 1),
-				 	int32(winWidth/Pwidth - 1), int32(winHeight/Pheight - 1)}
-				renderer.Copy(texture, &src, &dst)
+				switch{
+					case (array[j][i - 1] != PSurface):
+						src = sdl.Rect{int32(Frame[array[j][i - 1]].Width), int32(Frame[array[j][i - 1]].Height),
+							int32(imgWidth/Pwidth), int32(imgHeight/Pheight)}
+						dst = sdl.Rect{int32(Win[i].Width + 1), int32(Win[i].Height + 1),
+				 			int32(winWidth/Pwidth - 1), int32(winHeight/Pheight - 1)}
+						renderer.Copy(texture, &src, &dst)
+
+					case j == len(array) - 1:
+						src = sdl.Rect{int32(Frame[array[j][i - 1]].Width), int32(Frame[array[j][i - 1]].Height),
+							int32(imgWidth/Pwidth), int32(imgHeight/Pheight)}
+						dst = sdl.Rect{int32(Win[i].Width + 1), int32(Win[i].Height + 1),
+							int32(winWidth/Pwidth - 1), int32(winHeight/Pheight - 1)}
+						renderer.Copy(texture, &src, &dst)
 				}
 			}
-
 			renderer.Present()
 			time.Sleep(1500 * time.Millisecond)
 			renderer.Clear()
