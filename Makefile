@@ -6,7 +6,11 @@
 #    By: croy <croy@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/03/15 16:41:50 by croy              #+#    #+#              #
+<<<<<<< HEAD
 #    Updated: 2016/03/17 19:47:21 by tbalea           ###   ########.fr        #
+=======
+#    Updated: 2016/03/21 18:13:39 by croy             ###   ########.fr        #
+>>>>>>> ui
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +22,10 @@ B_PKG = go build
 BIN = go install $(NAME)
 RM = rm -rf bin/$(NAME)
 
-PKGS = algo
+PKGS = github.com/veandco/go-sdl2/sdl \
+	   n-puzzle \
+	   ui \
+	   algo
 
 all: $(NAME)
 
