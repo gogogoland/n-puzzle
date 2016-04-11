@@ -40,7 +40,7 @@ func DrawPuzzle(array [][]int, Pwidth, Pheight int){
 			}
 
 			renderer.Present()
-			time.Sleep(1000 * time.Millisecond)
+			time.Sleep(1500 * time.Millisecond)
 			renderer.Clear()
 		}
 		solve += 1
