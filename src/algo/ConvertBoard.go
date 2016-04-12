@@ -14,8 +14,8 @@ package algo
 
 var (
 	obv   int
-	snail map[int]int
-	right map[int]int
+	snail []int
+	right []int
 )
 
 //	Functions
@@ -23,9 +23,11 @@ var (
 func SaveSnail(board [][]int, long, large int) {
 	x, y := 0, 0
 	i, min, max := 1, 0, long*large
-	snail := map[int]int{}
-	right := map[int]int{}
+	snail = make([]int, max+1)
+	right = make([]int, max+1)
 
+	snail[0] = 0
+	right[0] = 0
 	for i <= max {
 		for i <= max && y < large-min {
 			snail[(x*large)+y+1] = i
@@ -53,12 +55,11 @@ func SaveSnail(board [][]int, long, large int) {
 			right[i] = (x * large) + y + 1
 			i++
 		}
-		x++
+		y++
 	}
-	if max%2 == 1 && long == large {
+	if i == max && max%2 == 1 && long == large {
 		snail[(x*large)+y+1] = i
 		right[i] = (x * large) + y + 1
-		i++
 	}
 	i--
 	obv = right[i]
@@ -80,4 +81,16 @@ func ConvertToSnail(board [][]int, long, large int) {
 			board[x][y] = snail[board[x][y]]
 		}
 	}
+}
+
+//	*	Return Value Final
+func Return(board [][]int, long, large int) []int {
+	var ret = make([]int, long*large)
+
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			ret[x+y] = board[x][y]
+		}
+	}
+	return ret
 }

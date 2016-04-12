@@ -13,7 +13,7 @@
 package algo
 
 /*import (
-	"container/heap"
+"container/heap"
 )*/
 
 //	Methods
@@ -21,6 +21,7 @@ package algo
 type Path struct {
 	x, y  int
 	board [][]int
+	ret   []int
 }
 
 //	*	Puzzle composition and value of it
@@ -38,10 +39,16 @@ type PrioQueue []Tabl
 
 //	*	Initialise Table
 func InitTable(board [][]int, x, y int) Tabl {
+	tmp := make([][]int, len(board))
+	for i := 0; i < len(board); i++ {
+		tmp[i] = make([]int, len(board[i]))
+		copy(tmp[i], board[i])
+	}
+
 	table := Tabl{
 		rang:  0,
 		from:  0,
-		table: board,
+		table: tmp,
 		cur:   0,
 		g:     0,
 		h:     0,
@@ -80,6 +87,9 @@ func ComparePrioQueue(tbl Tabl, lst PrioQueue, long, large int) bool {
 
 //	*	Compare table
 func CompareTable(b1, b2 Tabl, long, large int) bool {
+	if &b1 == nil || &b2 == nil {
+		return false
+	}
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
 			if b1.table[x][y] != b2.table[x][y] {
