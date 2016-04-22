@@ -19,14 +19,20 @@ import (
 	"math"
 )
 
-//	TEST HEAP
+//	Functions for heap list
+func (h PrioQueue) Len() int {
+	return len(h)
+}
 
-// An Tabl is a min-heap of ints.
+func (h PrioQueue) Less(i, j int) bool {
+	return h[i].rang < h[j].rang
+}
 
-func (h PrioQueue) Len() int           { return len(h) }
-func (h PrioQueue) Less(i, j int) bool { return h[i].rang < h[j].rang }
-func (h PrioQueue) Swap(i, j int)      { h[i].rang, h[j].rang = h[j].rang, h[i].rang }
+func (h PrioQueue) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
 
+//	*	Add Tabl structure in heap list
 func (h *PrioQueue) Push(x interface{}) {
 	*h = append(*h, Tabl{
 		rang:  x.(Tabl).rang,
@@ -83,7 +89,7 @@ func PrintAll(board [][]int, long, large int) {
  * TEST
  */
 
-//	Functions
+//	Functions A*
 //	*	Set Waited board
 func SetObjectifBoard(long, large int) [][]int {
 	x, y, i := 0, 0, 1
@@ -102,9 +108,9 @@ func SetObjectifBoard(long, large int) [][]int {
 }
 
 //	*	Implementation of A*
-func Pathfinding(board [][]int, long, large, algo int) (*list.List, int, int) {
-	if board == nil || long == 0 || large == 0 || algo < 0 || algo > 2 {
-		return nil, 0, 0
+func Pathfinding(board [][]int, long, large, algo int) *list.List {
+	if board == nil || long <= 0 || large <= 0 || algo < 0 || algo > 2 {
+		return nil
 	}
 	SaveSnail(board, long, large)
 	ConvertToRight(board, long, large)
@@ -115,7 +121,6 @@ func Pathfinding(board [][]int, long, large, algo int) (*list.List, int, int) {
 	var from int
 	end := false
 	id := 0
-
 	//	Init Heap
 	heap.Init(open)
 	heap.Init(close)
@@ -123,7 +128,13 @@ func Pathfinding(board [][]int, long, large, algo int) (*list.List, int, int) {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
 		//	Push current in close list (or Init close list with)
+		//	TEST BEG
+		fmt.Println("~~I~~")
+		PrintAll(cur.(Tabl).table, long, large)
+		fmt.Println("~~I~~")
+		//	TEST END
 		heap.Push(close, cur)
+		heap.Fix(close, len(*close)-1)
 		//	Find next path
 		tmp, id = AlgoAStar(cur.(Tabl), long, large, id, algo)
 		for i := 0; i < 4; i++ {
@@ -145,7 +156,7 @@ func Pathfinding(board [][]int, long, large, algo int) (*list.List, int, int) {
 	if end {
 		path := list.New()
 		ConvertToSnail(tmp[id].table, long, large)
-		path.PushFront(Path{ret: Return(tmp[id].table, long, large)})
+		path.PushFront(Path{Ret: Return(tmp[id].table, long, large)})
 		//	TEST BEG
 		fmt.Println("~~A~~")
 		PrintAll(tmp[id].table, long, large)
@@ -155,7 +166,7 @@ func Pathfinding(board [][]int, long, large, algo int) (*list.List, int, int) {
 			//	add to list final
 			if (*close)[i].cur == from {
 				ConvertToSnail((*close)[i].table, long, large)
-				path.PushFront(Path{ret: Return((*close)[i].table, long, large)})
+				path.PushFront(Path{Ret: Return((*close)[i].table, long, large)})
 				from = (*close)[i].from
 				//	TEST BEG
 				fmt.Println("~~I~~")
@@ -166,10 +177,10 @@ func Pathfinding(board [][]int, long, large, algo int) (*list.List, int, int) {
 			i++
 		}
 		fmt.Println("~~V~~")
-		return path, long, large
+		return path
 	}
 	//	else return null
-	return nil, 0, 0
+	return nil
 }
 
 //	*	Find missing piece
@@ -222,11 +233,7 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 			//	Save position of obv
 			path[i].x, path[i].y = mx+x, my+y
 			//	Reswitch place
-			/*	*	*/
-			/*	*	*/
 			cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
-			/*	*	*/
-			/*	*	*/
 		} else {
 			path[i].rang = -1
 		}

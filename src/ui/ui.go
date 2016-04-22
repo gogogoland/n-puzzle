@@ -2,16 +2,16 @@
 ** croy@student.42.fr
 ** France
 ** N-Puzzle project
-*/
+ */
 
 package ui
 
 import (
+	"container/list"
 	"fmt"
-	"os"
 	"github.com/veandco/go-sdl2/sdl"
+	"os"
 )
-
 
 type Puzzle struct {
 	Width, Height int
@@ -22,32 +22,32 @@ type Window struct {
 }
 
 var (
-	window 		*sdl.Window
-	renderer 	*sdl.Renderer
-	texture 	*sdl.Texture
-	image 		*sdl.Surface
-	event			sdl.Event
-	running 	bool
-	src, dst 	sdl.Rect
-	rect 			sdl.Rect
-	err 			error
+	window   *sdl.Window
+	renderer *sdl.Renderer
+	texture  *sdl.Texture
+	image    *sdl.Surface
+	event    sdl.Event
+	running  bool
+	src, dst sdl.Rect
+	rect     sdl.Rect
+	err      error
 )
 
 var (
-	winWidth, winHeight int = 1024, 764
-	winTitle string = "N-Puzzle"
-	imgWidth, imgHeight int = 1500, 1000
-	imgPuzzle string = "../assets/cat.bmp"
+	winWidth, winHeight int    = 1024, 764
+	winTitle            string = "N-Puzzle"
+	imgWidth, imgHeight int    = 1500, 1000
+	imgPuzzle           string = "../assets/cat.bmp"
 )
 
 var (
 	Frame map[int]Puzzle
-	Win map[int]Window
+	Win   map[int]Window
 )
 
 //Main Function
 
-func Ui(array [][]int, Pwid, Phei int) int{
+func Ui(array *list.List, Pwid, Phei int) int {
 	Pwidth, Pheight := Pwid, Phei
 
 	//Init Window
@@ -59,7 +59,6 @@ func Ui(array [][]int, Pwid, Phei int) int{
 	}
 	//Destroy Window
 	defer window.Destroy()
-
 
 	//Init Render
 	renderer, err = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
@@ -78,7 +77,6 @@ func Ui(array [][]int, Pwid, Phei int) int{
 	}
 	//Destroy img for Puzzle
 	defer image.Free()
-
 
 	texture, err = renderer.CreateTextureFromSurface(image)
 	if err != nil {
