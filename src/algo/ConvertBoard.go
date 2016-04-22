@@ -89,7 +89,7 @@ func Return(board [][]int, long, large int) []int {
 
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
-			ret[x+y] = board[x][y]
+			ret[(x*large)+y] = board[x][y]
 		}
 	}
 	return ret

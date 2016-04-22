@@ -9,6 +9,7 @@ package ui
 import (
 	"algo"
 	"container/list"
+	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"time"
 )
@@ -34,19 +35,40 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 			renderer.FillRect(&rect)
 
 			for i := 1; i <= PSurface; i++ {
+
+				fmt.Printf("%d ", path.Value.(algo.Path).Ret[i-1])
+				if (i-1)%3 == 2 {
+					fmt.Printf("\n")
+				}
+				if i == 9 {
+					fmt.Printf("`~~'\n")
+				}
+
 				switch {
 				case (path.Value.(algo.Path).Ret[i-1] != PSurface):
-					src = sdl.Rect{int32(Frame[path.Value.(algo.Path).Ret[i-1]].Width), int32(Frame[path.Value.(algo.Path).Ret[i-1]].Height),
-						int32(imgWidth / Pwidth), int32(imgHeight / Pheight)}
-					dst = sdl.Rect{int32(Win[i].Width + 1), int32(Win[i].Height + 1),
-						int32(winWidth/Pwidth - 1), int32(winHeight/Pheight - 1)}
+					src = sdl.Rect{
+						int32(Frame[path.Value.(algo.Path).Ret[i-1]].Width),
+						int32(Frame[path.Value.(algo.Path).Ret[i-1]].Height),
+						int32(imgWidth / Pwidth),
+						int32(imgHeight / Pheight)}
+					dst = sdl.Rect{
+						int32(Win[i].Width + 1),
+						int32(Win[i].Height + 1),
+						int32(winWidth/Pwidth - 1),
+						int32(winHeight/Pheight - 1)}
 					renderer.Copy(texture, &src, &dst)
 
 				case path.Next() == nil:
-					src = sdl.Rect{int32(Frame[path.Value.(algo.Path).Ret[i-1]].Width), int32(Frame[path.Value.(algo.Path).Ret[i-1]].Height),
-						int32(imgWidth / Pwidth), int32(imgHeight / Pheight)}
-					dst = sdl.Rect{int32(Win[i].Width + 1), int32(Win[i].Height + 1),
-						int32(winWidth/Pwidth - 1), int32(winHeight/Pheight - 1)}
+					src = sdl.Rect{
+						int32(Frame[path.Value.(algo.Path).Ret[i-1]].Width),
+						int32(Frame[path.Value.(algo.Path).Ret[i-1]].Height),
+						int32(imgWidth / Pwidth),
+						int32(imgHeight / Pheight)}
+					dst = sdl.Rect{
+						int32(Win[i].Width + 1),
+						int32(Win[i].Height + 1),
+						int32(winWidth/Pwidth - 1),
+						int32(winHeight/Pheight - 1)}
 					renderer.Copy(texture, &src, &dst)
 				}
 			}

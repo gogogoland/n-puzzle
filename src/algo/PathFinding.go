@@ -83,6 +83,7 @@ func PrintAll(board [][]int, long, large int) {
 		}
 		fmt.Printf("\n")
 	}
+	fmt.Println("`~I~'")
 }
 
 /*
@@ -128,11 +129,6 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
 		//	Push current in close list (or Init close list with)
-		//	TEST BEG
-		fmt.Println("~~I~~")
-		PrintAll(cur.(Tabl).table, long, large)
-		fmt.Println("~~I~~")
-		//	TEST END
 		heap.Push(close, cur)
 		heap.Fix(close, len(*close)-1)
 		//	Find next path
@@ -158,7 +154,6 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 		ConvertToSnail(tmp[id].table, long, large)
 		path.PushFront(Path{Ret: Return(tmp[id].table, long, large)})
 		//	TEST BEG
-		fmt.Println("~~A~~")
 		PrintAll(tmp[id].table, long, large)
 		//	TEST END
 		i := 0
@@ -169,16 +164,16 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 				path.PushFront(Path{Ret: Return((*close)[i].table, long, large)})
 				from = (*close)[i].from
 				//	TEST BEG
-				fmt.Println("~~I~~")
 				PrintAll((*close)[i].table, long, large)
 				//	TEST END
 				i = 0
 			}
 			i++
 		}
-		fmt.Println("~~V~~")
+		//	else return null
 		return path
 	}
+	fmt.Println("No solution")
 	//	else return null
 	return nil
 }
