@@ -75,13 +75,14 @@ func ReadFile() ([][]int, int, int) {
 
 //	*	Save Data in tabl [][]int
 func SaveData(long, large int, scanner *bufio.Scanner) [][]int {
-	var i, j int
+	var i, j, ll int
 	var tabl [][]int
 
 	tabl = make([][]int, long)
+	ll = long * large
 	for scanner.Scan() && long > 0 && large > 0 {
 		array := strings.Split(scanner.Text(), " ")
-		if array[0][0] == '#' {
+		if len(array[0]) < 1 || array[0][0] == '#' {
 			continue
 		}
 		tabl[i] = make([]int, large)
@@ -99,7 +100,7 @@ func SaveData(long, large int, scanner *bufio.Scanner) [][]int {
 				break
 			}
 			if num == 0 {
-				num = long * large
+				num = ll
 			}
 			tabl[i][j] = num
 		}
@@ -164,6 +165,7 @@ func CheckData(tabl [][]int, long, large int) bool {
 				fmt.Println(n, "is not beetween 0 and", max)
 				return false
 			} else if check[n-1] == 1 {
+				fmt.Println(check)
 				fmt.Println("Repetitive value of", n)
 				return false
 			}

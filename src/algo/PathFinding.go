@@ -76,10 +76,11 @@ func TestHeap() {
 	}
 }
 
-func PrintAll(board [][]int, long, large int) {
+func PrintAll(pr Tabl, long, large int) {
+	fmt.Println("Move number", pr.g)
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
-			fmt.Printf("%d ", board[x][y])
+			fmt.Printf("%d ", pr.table[x][y])
 		}
 		fmt.Printf("\n")
 	}
@@ -154,7 +155,7 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 		ConvertToSnail(tmp[id].table, long, large)
 		path.PushFront(Path{Ret: Return(tmp[id].table, long, large)})
 		//	TEST BEG
-		PrintAll(tmp[id].table, long, large)
+		PrintAll(tmp[id], long, large)
 		//	TEST END
 		i := 0
 		for from != 0 {
@@ -164,7 +165,7 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 				path.PushFront(Path{Ret: Return((*close)[i].table, long, large)})
 				from = (*close)[i].from
 				//	TEST BEG
-				PrintAll((*close)[i].table, long, large)
+				PrintAll((*close)[i], long, large)
 				//	TEST END
 				i = 0
 			}
@@ -203,7 +204,7 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 	mx := 0
 	my := 0
 
-	mx, my = MissPuzzle(cur.table, long, large)
+	mx, my = cur.x, cur.y
 	for i := 0; i < 4; i++ {
 		x := (i - 2) % 2
 		y := (i - 1) % 2
@@ -224,7 +225,7 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 			path[i].cur, path[i].from = id, cur.cur
 			//	Calcul cost of path
 			path[i].g = cur.g + 1
-			path[i].rang = path[i].g + path[i].h
+			path[i].rang = cur.h + path[i].h
 			//	Save position of obv
 			path[i].x, path[i].y = mx+x, my+y
 			//	Reswitch place
@@ -239,16 +240,15 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 //	*	*	Manahttan
 func Manahttan(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
-	tmpHx := 0
-	tmpHy := 0
+	var tmpHx, tmpHy, x, y int
 
-	for x := 0; x < long; x++ {
-		for y := 0; y < large; y++ {
-			tmpHx = (res.table[x][y] % long) - (x + 1)
+	for x = 0; x < long; x++ {
+		for y = 0; y < large; y++ {
+			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
 			}
-			tmpHy = (res.table[x][y] / long) - y
+			tmpHy = ((res.table[x][y] - 1) % large) - y
 			if tmpHy < 0 {
 				tmpHy = -1 * tmpHy
 			}
@@ -261,17 +261,15 @@ func Manahttan(cur [][]int, long, large, mx, my int) Tabl {
 //	*	*	Euclidien
 func Euclidien(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
-	tmpHx := 0
-	tmpHy := 0
-	tmpH := 0
+	var tmpHx, tmpHy, tmpH, x, y int
 
-	for x := 0; x < long; x++ {
-		for y := 0; y < large; y++ {
-			tmpHx = (res.table[x][y] % long) - (x + 1)
+	for x = 0; x < long; x++ {
+		for y = 0; y < large; y++ {
+			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
 			}
-			tmpHy = (res.table[x][y] / long) - y
+			tmpHy = ((res.table[x][y] - 1) % large) - y
 			if tmpHy < 0 {
 				tmpHy = -1 * tmpHy
 			}
@@ -285,15 +283,26 @@ func Euclidien(cur [][]int, long, large, mx, my int) Tabl {
 //	*	*	Marecages
 func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
-	tmpH := 0
+	var tmpH, tmpHx, tmpHy, tmpG, tmpGx, tmpGy, gx, gy int
 
+	gx, gy = MissPuzzle(cur, long, large)
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
-			tmpH = res.table[x][y] - ((x + 1) + (y * large))
-			if tmpH < 0 {
-				tmpH = -1 * tmpH
+			tmpHx = ((res.table[x][y] - 1) / large) - x
+			if tmpHx < 0 {
+				tmpHx = -1 * tmpHx
 			}
-			res.h += tmpH
+			tmpHy = ((res.table[x][y] - 1) % large) - y
+			if tmpHy < 0 {
+				tmpHy = -1 * tmpHy
+			}
+			tmpH = tmpHx + tmpHy
+			tmpGx = (gx - x) * (gx - x)
+			tmpGy = (gy - y) * (gy - y)
+			tmpG = int(math.Sqrt(float64(tmpGx + tmpGy)))
+
+			//tmpH = res.table[x][y] - ((x + 1) + (y * large))
+			res.h += tmpG * tmpH
 		}
 	}
 	return res
