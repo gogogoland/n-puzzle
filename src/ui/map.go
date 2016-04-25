@@ -39,10 +39,6 @@ func SeparateImgInMap(Pwidth, Pheight int){
 				((x - 1) * imgWidth / Pwidth),
 				((y - 1) * imgHeight / Pheight),
 			}
-			Win[i] = Window{
-				((x - 1) * winWidth / Pwidth),
-				((y - 1) * winHeight / Pheight),
-			}
 			//Debug
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y, ", x, y)
 			i++
@@ -52,10 +48,6 @@ func SeparateImgInMap(Pwidth, Pheight int){
 			Frame[i] = Puzzle{
 				((x - 1) * imgWidth / Pwidth),
 				((y - 1) * imgHeight / Pheight),
-			}
-			Win[i] = Window{
-				((x - 1) * winWidth / Pwidth),
-				((y - 1) * winHeight / Pheight),
 			}
 			//Debug
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
@@ -68,10 +60,6 @@ func SeparateImgInMap(Pwidth, Pheight int){
 				((x - 1) * imgWidth / Pwidth),
 				((y - 1) * imgHeight / Pheight),
 			}
-			Win[i] = Window{
-				((x - 1) * winWidth / Pwidth),
-				((y - 1) * winHeight / Pheight),
-			}
 			//Debug
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
 			i++
@@ -83,10 +71,23 @@ func SeparateImgInMap(Pwidth, Pheight int){
 				((x - 1) * imgWidth / Pwidth),
 				((y - 1) * imgHeight / Pheight),
 			}
-			Win[i] = Window{
-				((x - 1) * winWidth / Pwidth),
-				((y - 1) * winHeight / Pheight),
-			}
 			fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
+	}
+
+	y = 0
+	for i := 1; i <= PSurface; i++ {
+		for y < Pheight {
+			x = 0
+			for x < Pwidth {
+				Win[i] = Window{
+					(x * winWidth / Pwidth),
+					(y * winHeight / Pheight),
+				}
+				fmt.Println(i, " => Window :", Win[i], "Frame :", Frame[i], "X,Y ", x, y)
+				x++
+				i++
+			}
+			y++
 		}
+	}
 }
