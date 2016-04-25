@@ -36,12 +36,10 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 
 			for i := 1; i <= PSurface; i++ {
 
-				fmt.Printf("%d ", path.Value.(algo.Path).Ret[i-1])
-				if (i-1)%3 == 2 {
-					fmt.Printf("\n")
-				}
-				if i == 9 {
-					fmt.Printf("`~~'\n")
+				fmt.Printf("[Algo] = %d ", path.Value.(algo.Path).Ret[i-1])
+				fmt.Printf("[i] = %d\n", i)
+				if (i == PSurface) {
+					fmt.Print("~\n")
 				}
 
 				switch {
@@ -56,7 +54,6 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 						int32(Win[i].Height + 1),
 						int32(winWidth/Pwidth - 1),
 						int32(winHeight/Pheight - 1)}
-					renderer.Copy(texture, &src, &dst)
 
 				case path.Next() == nil:
 					src = sdl.Rect{
@@ -69,8 +66,8 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 						int32(Win[i].Height + 1),
 						int32(winWidth/Pwidth - 1),
 						int32(winHeight/Pheight - 1)}
-					renderer.Copy(texture, &src, &dst)
 				}
+				renderer.Copy(texture, &src, &dst)
 			}
 			renderer.Present()
 			time.Sleep(1500 * time.Millisecond)
