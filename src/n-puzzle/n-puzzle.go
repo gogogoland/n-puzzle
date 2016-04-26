@@ -83,10 +83,10 @@ func SaveData(long, large int, scanner *bufio.Scanner) [][]int {
 	for scanner.Scan() && long > 0 && large > 0 {
 		array := strings.Split(scanner.Text(), " ")
 		blank = 0
-		for len(array[blank]) < 1 {
+		for blank < len(array) && len(array[blank]) < 1 {
 			blank++
 		}
-		if array[blank][0] == '#' {
+		if len(array) == blank || array[blank][0] == '#' {
 			continue
 		}
 		tabl[i] = make([]int, large)
