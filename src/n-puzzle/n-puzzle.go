@@ -75,18 +75,26 @@ func ReadFile() ([][]int, int, int) {
 
 //	*	Save Data in tabl [][]int
 func SaveData(long, large int, scanner *bufio.Scanner) [][]int {
-	var i, j, ll int
+	var i, j, blank, ll int
 	var tabl [][]int
 
 	tabl = make([][]int, long)
 	ll = long * large
 	for scanner.Scan() && long > 0 && large > 0 {
 		array := strings.Split(scanner.Text(), " ")
-		if len(array[0]) < 1 || array[0][0] == '#' {
+		blank = 0
+		for len(array[blank]) < 1 {
+			blank++
+		}
+		if array[blank][0] == '#' {
 			continue
 		}
 		tabl[i] = make([]int, large)
-		for j = 0; j < len(array); j++ {
+		for j = blank; j < len(array); j++ {
+			if len(array[j]) < 1 {
+				blank++
+				continue
+			}
 			if array[j][0] == '#' {
 				break
 			}
@@ -95,16 +103,16 @@ func SaveData(long, large int, scanner *bufio.Scanner) [][]int {
 				fmt.Println("Converting data failed at line", i, "element", array[j])
 				return nil
 			}
-			if j == large {
+			if j-blank == large {
 				j = 0
 				break
 			}
 			if num == 0 {
 				num = ll
 			}
-			tabl[i][j] = num
+			tabl[i][j-blank] = num
 		}
-		if j != large {
+		if j-blank != large {
 			fmt.Println("Wrong number of colomn.")
 			return nil
 		}
