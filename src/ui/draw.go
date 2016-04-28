@@ -20,14 +20,7 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 	solve := 1
 	PSurface := Pheight * Pwidth
 
-	for running {
-		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent:
-				running = false
-			}
-		}
-
+	for running && lst.Front() != nil {
 		renderer.Clear()
 		for path := lst.Front(); path != nil && solve == 1; path = path.Next() {
 			rect = sdl.Rect{0, 0, int32(winWidth), int32(winHeight)}
@@ -70,9 +63,11 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 				renderer.Copy(texture, &src, &dst)
 			}
 			renderer.Present()
-			time.Sleep(1500 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 			renderer.Clear()
 		}
 		solve += 1
+		sdl.Delay(1500)
+		running = false
 	}
 }
