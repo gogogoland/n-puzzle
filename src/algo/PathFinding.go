@@ -58,24 +58,6 @@ func (h *PrioQueue) Pop() interface{} {
 /*
  * TEST
  */
-// This example inserts several ints into an Tabl, checks the minimum,
-// and removes them in order of priority.
-func TestHeap() {
-	h := &PrioQueue{Tabl{rang: 2, from: 2}}
-	//tmp := Tabl{rang: []int{-1}}
-
-	heap.Init(h)
-	heap.Push(h, Tabl{rang: -1, from: 0})
-	heap.Push(h, Tabl{rang: -7, from: 1000})
-	heap.Push(h, Tabl{rang: 81, from: -10000})
-	heap.Push(h, Tabl{rang: 0, from: 0})
-	fmt.Printf("minimum: %d\n", (*h)[0].rang)
-	//	TO TEST
-	for h.Len() > 0 {
-		fmt.Printf("rg:%d\n", heap.Pop(h).(Tabl).rang)
-	}
-}
-
 func PrintAll(pr Tabl, long, large int) {
 	fmt.Println("Move number", pr.g)
 	for x := 0; x < long; x++ {
@@ -92,6 +74,29 @@ func PrintAll(pr Tabl, long, large int) {
  */
 
 //	Functions A*
+//	*	Check if the board is solvable
+func CheckSolvable(board [][]int, long, large, algo int) (bool, int) {
+	var cross, i, j, max int
+	var chain []int
+
+	cross = 0
+	max = long * large
+	chain = BoardToString(board, long, large)
+	for i = 0; i < max; i++ {
+		for j = i + 1; j < max; j++ {
+			if chain[j] != obv && chain[i] != obv && chain[j] < chain[i] {
+				cross++
+			}
+		}
+	}
+	if cross != 0 && long%2 == cross%2 {
+		fmt.Println("No solution")
+		return false, 0
+	}
+	fmt.Println("Is soluble. .. I hope.")
+	return true, cross
+}
+
 //	*	Set Waited board
 func SetObjectifBoard(long, large int) [][]int {
 	x, y, i := 0, 0, 1
@@ -111,22 +116,30 @@ func SetObjectifBoard(long, large int) [][]int {
 
 //	*	Implementation of A*
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
-	if board == nil || long <= 0 || large <= 0 || algo < 0 || algo > 2 {
+	if board == nil || long <= 0 || large <= 0 {
+		return nil
+	} else if algo < 0 || algo > 2 {
+		fmt.Println("Algo value should be between 0 and 2 both inclued.")
 		return nil
 	}
 	SaveSnail(board, long, large)
 	ConvertToRight(board, long, large)
+	solv, end := CheckSolvable(board, long, large, algo)
+	if !solv {
+		return nil
+	}
 	objtf := SetObjectifBoard(long, large)
 	open := InitHeapList(board, long, large)
 	close := InitHeapList(objtf, long, large)
+	if end == 0 {
+		return ListPath(long, large, (*close)[0], nil)
+	}
 	var tmp [4]Tabl
-	var from int
-	end := false
 	id := 0
 	//	Init Heap
 	heap.Init(open)
 	heap.Init(close)
-	for len(*open) > 0 && !end {
+	for len(*open) > 0 {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
 		//	Push current in close list (or Init close list with)
@@ -142,41 +155,42 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 				}
 				//	Check if it's final
 				if CompareTable(tmp[i], (*close)[0], long, large) {
-					from = tmp[i].from
-					id = i
-					end = true
+					return ListPath(long, large, tmp[i], *close)
 				}
 			}
 		}
 	}
-	//	if there a solution, set a list of path
-	if end {
-		path := list.New()
-		ConvertToSnail(tmp[id].table, long, large)
-		path.PushFront(Path{Ret: Return(tmp[id].table, long, large)})
-		//	TEST BEG
-		PrintAll(tmp[id], long, large)
-		//	TEST END
-		i := 0
-		for from != 0 {
-			//	add to list final
-			if (*close)[i].cur == from {
-				ConvertToSnail((*close)[i].table, long, large)
-				path.PushFront(Path{Ret: Return((*close)[i].table, long, large)})
-				from = (*close)[i].from
-				//	TEST BEG
-				PrintAll((*close)[i], long, large)
-				//	TEST END
-				i = 0
-			}
-			i++
-		}
-		//	else return null
-		return path
-	}
 	fmt.Println("No solution")
-	//	else return null
 	return nil
+}
+
+func ListPath(long, large int, tmp Tabl, close []Tabl) *list.List {
+	var i, from int
+
+	//	if there a solution, set a list of path
+	path := list.New()
+	ConvertToSnail(tmp.table, long, large)
+	path.PushFront(Path{Ret: BoardToString(tmp.table, long, large)})
+	from = tmp.from
+	//	TEST BEG
+	defer fmt.Println("Number of case tested: ", len(close))
+	defer PrintAll(tmp, long, large)
+	//	TEST END
+	i = 0
+	for from != 0 {
+		//	add to list final
+		if close[i].cur == from {
+			ConvertToSnail(close[i].table, long, large)
+			path.PushFront(Path{Ret: BoardToString(close[i].table, long, large)})
+			from = close[i].from
+			//	TEST BEG
+			defer PrintAll(close[i], long, large)
+			//	TEST END
+			i = 0
+		}
+		i++
+	}
+	return path
 }
 
 //	*	Find missing piece

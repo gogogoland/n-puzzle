@@ -70,9 +70,6 @@ func ComparePrioQueue(tbl Tabl, lst PrioQueue, long, large int) bool {
 	for i := 0; i < max; i++ {
 		if tbl.h == lst[i].h {
 			if CompareTable(tbl, lst[i], long, large) {
-				//	if equals, get the fewest rang
-				//	?	Maybe fix heap
-				//	?	Only to open list
 				if tbl.g < lst[i].g {
 					lst[i].rang = tbl.rang
 					lst[i].from = tbl.from
@@ -99,18 +96,3 @@ func CompareTable(b1, b2 Tabl, long, large int) bool {
 	}
 	return true
 }
-
-//  *   Functions for method Path
-//  *   *   Add Path
-//func (cur *Path) AddPath(add *Path) {
-//	cur.next = *add
-//	add.prev = *cur
-//}
-
-//  *   *   Initialaze Path
-//func (p Path) InitPath(x, y uint) {
-//	p.next = nil
-//	p.prev = nil
-//	p.x = x
-//	p.y = y
-//}

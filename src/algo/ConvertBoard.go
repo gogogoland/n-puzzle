@@ -83,8 +83,8 @@ func ConvertToSnail(board [][]int, long, large int) {
 	}
 }
 
-//	*	Return Value Final
-func Return(board [][]int, long, large int) []int {
+//	*	Transform [][]int to []int
+func BoardToString(board [][]int, long, large int) []int {
 	var ret = make([]int, long*large)
 
 	for x := 0; x < long; x++ {

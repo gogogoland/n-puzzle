@@ -9,7 +9,7 @@ package ui
 import (
 	"algo"
 	"container/list"
-	"fmt"
+	//"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"time"
 )
@@ -29,11 +29,11 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 
 			for i := 1; i <= PSurface; i++ {
 
-				fmt.Printf("[Algo] = %d ", path.Value.(algo.Path).Ret[i-1])
-				fmt.Printf("[i] = %d\n", i)
-				if (i == PSurface) {
-					fmt.Print("~\n")
-				}
+				//fmt.Printf("[Algo] = %d ", path.Value.(algo.Path).Ret[i-1])
+				//fmt.Printf("[i] = %d\n", i)
+				//if (i == PSurface) {
+				//	fmt.Print("~\n")
+				//}
 
 				switch {
 				case (path.Value.(algo.Path).Ret[i-1] != PSurface):
