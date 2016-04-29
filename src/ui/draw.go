@@ -20,21 +20,14 @@ func DrawPuzzle(lst *list.List, Pwidth, Pheight int) {
 	solve := 1
 	PSurface := Pheight * Pwidth
 
-	for running && lst.Front() != nil {
+	time.Sleep(500 * time.Millisecond)
+	for running && lst != nil && lst.Front() != nil {
 		renderer.Clear()
 		for path := lst.Front(); path != nil && solve == 1; path = path.Next() {
 			rect = sdl.Rect{0, 0, int32(winWidth), int32(winHeight)}
 			renderer.SetDrawColor(255, 255, 255, 255)
 			renderer.FillRect(&rect)
-
 			for i := 1; i <= PSurface; i++ {
-
-				//fmt.Printf("[Algo] = %d ", path.Value.(algo.Path).Ret[i-1])
-				//fmt.Printf("[i] = %d\n", i)
-				//if (i == PSurface) {
-				//	fmt.Print("~\n")
-				//}
-
 				switch {
 				case (path.Value.(algo.Path).Ret[i-1] != PSurface):
 					src = sdl.Rect{

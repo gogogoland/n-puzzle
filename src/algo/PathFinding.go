@@ -55,9 +55,6 @@ func (h *PrioQueue) Pop() interface{} {
 	return x
 }
 
-/*
- * TEST
- */
 func PrintAll(pr Tabl, long, large int) {
 	fmt.Println("Move number", pr.g)
 	for x := 0; x < long; x++ {
@@ -69,34 +66,7 @@ func PrintAll(pr Tabl, long, large int) {
 	fmt.Println("`~I~'")
 }
 
-/*
- * TEST
- */
-
 //	Functions A*
-//	*	Check if the board is solvable
-func CheckSolvable(board [][]int, long, large, algo int) (bool, int) {
-	var cross, i, j, max int
-	var chain []int
-
-	cross = 0
-	max = long * large
-	chain = BoardToString(board, long, large)
-	for i = 0; i < max; i++ {
-		for j = i + 1; j < max; j++ {
-			if chain[j] != obv && chain[i] != obv && chain[j] < chain[i] {
-				cross++
-			}
-		}
-	}
-	if cross != 0 && long%2 == cross%2 {
-		fmt.Println("No solution")
-		return false, 0
-	}
-	fmt.Println("Is soluble. .. I hope.")
-	return true, cross
-}
-
 //	*	Set Waited board
 func SetObjectifBoard(long, large int) [][]int {
 	x, y, i := 0, 0, 1
@@ -118,22 +88,15 @@ func SetObjectifBoard(long, large int) [][]int {
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	if board == nil || long <= 0 || large <= 0 {
 		return nil
-	} else if algo < 0 || algo > 2 {
-		fmt.Println("Algo value should be between 0 and 2 both inclued.")
+	} else if algo < 0 || algo > 4 {
+		fmt.Println("Algo value should be between 0 and 4 both inclued.")
 		return nil
 	}
 	SaveSnail(board, long, large)
 	ConvertToRight(board, long, large)
-	solv, end := CheckSolvable(board, long, large, algo)
-	if !solv {
-		return nil
-	}
 	objtf := SetObjectifBoard(long, large)
 	open := InitHeapList(board, long, large)
 	close := InitHeapList(objtf, long, large)
-	if end == 0 {
-		return ListPath(long, large, (*close)[0], nil)
-	}
 	var tmp [4]Tabl
 	id := 0
 	//	Init Heap
@@ -142,17 +105,21 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	for len(*open) > 0 {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
+
 		//	Push current in close list (or Init close list with)
 		heap.Push(close, cur)
 		heap.Fix(close, len(*close)-1)
+
 		//	Find next path
 		tmp, id = AlgoAStar(cur.(Tabl), long, large, id, algo)
 		for i := 0; i < 4; i++ {
 			if tmp[i].rang > -1 {
+
 				//	Check if path exist already if so, check the fewest rang for the open list
 				if !ComparePrioQueue(tmp[i], *close, long, large) && !ComparePrioQueue(tmp[i], *open, long, large) {
 					heap.Push(open, tmp[i])
 				}
+
 				//	Check if it's final
 				if CompareTable(tmp[i], (*close)[0], long, large) {
 					return ListPath(long, large, tmp[i], *close)
@@ -160,35 +127,32 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 			}
 		}
 	}
-	fmt.Println("No solution")
+	fmt.Println("No solution founded")
 	return nil
 }
 
+//	Fill list with found path
 func ListPath(long, large int, tmp Tabl, close []Tabl) *list.List {
 	var i, from int
 
-	//	if there a solution, set a list of path
+	defer fmt.Println("Number of case tested: ", len(close))
+	defer PrintAll(tmp, long, large)
+
 	path := list.New()
 	ConvertToSnail(tmp.table, long, large)
 	path.PushFront(Path{Ret: BoardToString(tmp.table, long, large)})
 	from = tmp.from
-	//	TEST BEG
-	defer fmt.Println("Number of case tested: ", len(close))
-	defer PrintAll(tmp, long, large)
-	//	TEST END
 	i = 0
 	for from != 0 {
-		//	add to list final
+		i++
 		if close[i].cur == from {
 			ConvertToSnail(close[i].table, long, large)
 			path.PushFront(Path{Ret: BoardToString(close[i].table, long, large)})
 			from = close[i].from
-			//	TEST BEG
-			defer PrintAll(close[i], long, large)
-			//	TEST END
 			i = 0
+
+			defer PrintAll(close[i], long, large)
 		}
-		i++
 	}
 	return path
 }
@@ -223,25 +187,31 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 		x := (i - 2) % 2
 		y := (i - 1) % 2
 		if (mx+x) < long && (mx+x) >= 0 && (my+y) >= 0 && (my+y) < large {
+
 			//	Switch place
 			cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
+
 			//	Execute algo
 			switch algo {
-			case 0:
+			case 2:
 				path[i] = Marecages(cur.table, long, large, mx+x, my+y)
 			case 1:
 				path[i] = Euclidien(cur.table, long, large, mx+x, my+y)
-			case 2:
+			case 0:
 				path[i] = Manahttan(cur.table, long, large, mx+x, my+y)
+			case 3:
+				path[i] = Chebyshev(cur.table, long, large, mx+x, my+y)
+			case 4:
+				path[i] = IsWrong(cur.table, long, large, mx+x, my+y)
 			}
+
+			//	Save data
 			id++
-			//	Save for list path
 			path[i].cur, path[i].from = id, cur.cur
-			//	Calcul cost of path
 			path[i].g = cur.g + 1
 			path[i].rang = cur.h + path[i].h
-			//	Save position of obv
 			path[i].x, path[i].y = mx+x, my+y
+
 			//	Reswitch place
 			cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
 		} else {
@@ -322,6 +292,45 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 	return res
 }
 
+//	*	*	Chebyshev
+func Chebyshev(cur [][]int, long, large, mx, my int) Tabl {
+	res := InitTable(cur, mx, my)
+	var tmpHx, tmpHy, x, y int
+
+	for x = 0; x < long; x++ {
+		for y = 0; y < large; y++ {
+			tmpHx = ((res.table[x][y] - 1) / large) - x
+			if tmpHx < 0 {
+				tmpHx = -1 * tmpHx
+			}
+			tmpHy = ((res.table[x][y] - 1) % large) - y
+			if tmpHy < 0 {
+				tmpHy = -1 * tmpHy
+			}
+			if tmpHx > tmpHy {
+				res.h += tmpHx
+			} else {
+				res.h += tmpHy
+			}
+		}
+	}
+	return res
+}
+
+//	*	*	Number of incorrect case
+func IsWrong(cur [][]int, long, large, mx, my int) Tabl {
+	res := InitTable(cur, mx, my)
+
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			if res.table[x][y] != cur[x][y] {
+				res.h++
+			}
+		}
+	}
+	return res
+}
+
 //	*	Set Table of Obstacle
 //			? Only one time ?
 /*func CalculObstacle(board [][]uint, long uint, larg uint) [][]uint {
@@ -358,4 +367,39 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 		;
 	}
 	return path
+}*/
+
+//	*	Check if the board is solvable
+/*func CheckSolvable(board [][]int, long, large, algo int) (bool, int) {
+	var cross, i, j, max, d_pos, d_crs, d_lrg int
+	var chain []int
+
+	d_pos, cross = MissPuzzle(board, long, large)
+	cross = 0
+	max = long * large
+	chain = BoardToString(board, long, large)
+	for i = 0; i < max; i++ {
+		if chain[i] == obv {
+			d_pos = d_pos - (i / large)
+		}
+		for j = i + 1; j < max; j++ {
+			if chain[j] < chain[i] {
+				cross++
+			}
+		}
+	}
+	if cross == 0 {
+		fmt.Println("Already finished. Come on, Test me !")
+		return true, 0
+	}
+	d_lrg = large % 2
+	d_crs = cross % 2
+	d_pos = d_pos % 2 * d_pos % 2
+	fmt.Println("d_l=", d_lrg, "d_c=", d_crs, "d_p=", d_pos, "cross=", cross)
+	if (d_lrg == 1 && d_crs == 0) || (d_lrg == 0 && d_pos == d_crs) {
+		fmt.Println("No solution")
+		return false, cross
+	}
+	fmt.Println("Is soluble. .. I hope.")
+	return true, cross
 }*/
