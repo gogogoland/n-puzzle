@@ -17,6 +17,7 @@ import (
 	"container/list"
 	"fmt"
 	"math"
+	"time"
 )
 
 //	Functions for heap list
@@ -88,7 +89,7 @@ func SetObjectifBoard(long, large int) [][]int {
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	if board == nil || long <= 0 || large <= 0 {
 		return nil
-	} else if algo < 0 || algo > 4 {
+	} else if algo < 0 || algo > 6 {
 		fmt.Println("Algo value should be between 0 and 4 both inclued.")
 		return nil
 	}
@@ -102,6 +103,7 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	//	Init Heap
 	heap.Init(open)
 	heap.Init(close)
+	start := time.Now()
 	for len(*open) > 0 {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
@@ -122,11 +124,15 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 
 				//	Check if it's final
 				if CompareTable(tmp[i], (*close)[0], long, large) {
+					elapsed := time.Since(start)
+					fmt.Println("Time required: ", elapsed)
 					return ListPath(long, large, tmp[i], *close)
 				}
 			}
 		}
 	}
+	elapsed := time.Since(start)
+	log.Printf("Binomial took %s", elapsed)
 	fmt.Println("No solution founded")
 	return nil
 }
@@ -193,16 +199,20 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 
 			//	Execute algo
 			switch algo {
-			case 2:
-				path[i] = Marecages(cur.table, long, large, mx+x, my+y)
-			case 1:
-				path[i] = Euclidien(cur.table, long, large, mx+x, my+y)
 			case 0:
 				path[i] = Manahttan(cur.table, long, large, mx+x, my+y)
-			case 3:
+			case 1:
+				path[i] = Euclidien(cur.table, long, large, mx+x, my+y)
+			case 2:
 				path[i] = Chebyshev(cur.table, long, large, mx+x, my+y)
+			case 3:
+				path[i] = Marecages(cur.table, long, large, mx+x, my+y)
 			case 4:
+				path[i] = FeuFollet(cur.table, long, large, mx+x, my+y)
+			case 5:
 				path[i] = IsWrong(cur.table, long, large, mx+x, my+y)
+			case 6:
+				path[i] = IsRight(cur.table, long, large, mx+x, my+y)
 			}
 
 			//	Save data
@@ -257,7 +267,8 @@ func Euclidien(cur [][]int, long, large, mx, my int) Tabl {
 			if tmpHy < 0 {
 				tmpHy = -1 * tmpHy
 			}
-			tmpH = (tmpHx + tmpHy) * (tmpHy + tmpHx)
+			//tmpH = (tmpHx + tmpHy) * (tmpHy + tmpHx)
+			tmpH = (tmpHx * tmpHx) + (tmpHy + tmpHy)
 			res.h += int(math.Sqrt(float64(tmpH)))
 		}
 	}
@@ -269,6 +280,7 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
 	var tmpH, tmpHx, tmpHy, tmpG, tmpGx, tmpGy, gx, gy int
 
+	tmpGx, tmpGy = 0, 0
 	gx, gy = MissPuzzle(cur, long, large)
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
@@ -281,14 +293,65 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 				tmpHy = -1 * tmpHy
 			}
 			tmpH = tmpHx + tmpHy
-			tmpGx = (gx - x) * (gx - x)
-			tmpGy = (gy - y) * (gy - y)
-			tmpG = int(math.Sqrt(float64(tmpGx + tmpGy)))
+			if tmpH > 0 {
+				tmpGx = gx - x
+				if tmpGx < 0 {
+					tmpGx *= -1
+				}
+				tmpGy = gy - y
+				if tmpGy < 0 {
+					tmpGy *= -1
+				}
+				tmpG = Factorial(tmpGx + tmpGy)
+			}
+			//tmpGx = (gx - x) * (gx - x)
+			//tmpGy = (gy - y) * (gy - y)
+			//tmpG = int(math.Sqrt(float64(tmpGx + tmpGy)))
 
 			//tmpH = res.table[x][y] - ((x + 1) + (y * large))
-			res.h += tmpG * tmpH
+			//res.h += tmpG * tmpH
+			res.h += tmpH + tmpG
 		}
 	}
+	return res
+}
+
+//	*	*	Swamp Wisp
+func FeuFollet(cur [][]int, long, large, mx, my int) Tabl {
+	res := InitTable(cur, mx, my)
+	var tmpH, tmpHx, tmpHy, tmpG, tmpGx, tmpGy, gx, gy int
+
+	tmpG, tmpGx, tmpGy = 0, 0, 0
+	gx, gy = MissPuzzle(cur, long, large)
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			tmpHx = ((res.table[x][y] - 1) / large) - x
+			if tmpHx < 0 {
+				tmpHx = -1 * tmpHx
+			}
+			tmpHy = ((res.table[x][y] - 1) % large) - y
+			if tmpHy < 0 {
+				tmpHy = -1 * tmpHy
+			}
+			tmpH = tmpHx + tmpHy
+			if tmpH > 0 {
+				tmpGx = gx - x
+				if tmpGx < 0 {
+					tmpGx *= -1
+				}
+				tmpGy = gy - y
+				if tmpGy < 0 {
+					tmpGy *= -1
+				}
+				//if tmpG == 0 || tmpG > tmpGx + tmpGy {
+				if tmpG < tmpGx + tmpGy {
+					tmpG = tmpGx + tmpGy
+				}
+			}
+			res.h += tmpH
+		}
+	}
+	res.h += Factorial(tmpG)
 	return res
 }
 
@@ -325,6 +388,20 @@ func IsWrong(cur [][]int, long, large, mx, my int) Tabl {
 		for y := 0; y < large; y++ {
 			if res.table[x][y] != cur[x][y] {
 				res.h++
+			}
+		}
+	}
+	return res
+}
+
+//	*	*	Number of correct case
+func IsRight(cur [][]int, long, large, mx, my int) Tabl {
+	res := InitTable(cur, mx, my)
+
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			if res.table[x][y] == cur[x][y] {
+				res.h--
 			}
 		}
 	}

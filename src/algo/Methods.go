@@ -96,3 +96,17 @@ func CompareTable(b1, b2 Tabl, long, large int) bool {
 	}
 	return true
 }
+
+//	*	Factorial calcul
+func Factorial(n int) int {
+	var i int
+
+	if n < 0 {
+		return n
+	}
+	i = 1
+	for ; n > 1; n -= 1 {
+		i *= n
+	]
+	return (i)
+}
