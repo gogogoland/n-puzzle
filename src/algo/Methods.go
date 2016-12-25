@@ -32,6 +32,8 @@ type Tabl struct {
 	from  int
 	cur   int
 	x, y  int
+	objx  int
+	objy  int
 }
 
 //	*	Slice of Tabl
@@ -53,7 +55,9 @@ func InitTable(board [][]int, x, y int) Tabl {
 		g:     0,
 		h:     0,
 		x:     x,
-		y:     y}
+		y:     y,
+		objx:  -1,
+		objy:  -1}
 	return table
 }
 
@@ -107,6 +111,6 @@ func Factorial(n int) int {
 	i = 1
 	for ; n > 1; n -= 1 {
 		i *= n
-	]
+	}
 	return (i)
 }

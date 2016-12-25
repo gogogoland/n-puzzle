@@ -89,8 +89,8 @@ func SetObjectifBoard(long, large int) [][]int {
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	if board == nil || long <= 0 || large <= 0 {
 		return nil
-	} else if algo < 0 || algo > 6 {
-		fmt.Println("Algo value should be between 0 and 4 both inclued.")
+	} else if algo < 0 || algo > 7 {
+		fmt.Println("Algo value should be between 0 and 7 both inclued.")
 		return nil
 	}
 	SaveSnail(board, long, large)
@@ -125,14 +125,14 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 				//	Check if it's final
 				if CompareTable(tmp[i], (*close)[0], long, large) {
 					elapsed := time.Since(start)
-					fmt.Println("Time required: ", elapsed)
+					defer fmt.Println("Time required: ", elapsed)
 					return ListPath(long, large, tmp[i], *close)
 				}
 			}
 		}
 	}
 	elapsed := time.Since(start)
-	log.Printf("Binomial took %s", elapsed)
+	fmt.Println("Binomial took ", elapsed)
 	fmt.Println("No solution founded")
 	return nil
 }
@@ -208,10 +208,12 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 			case 3:
 				path[i] = Marecages(cur.table, long, large, mx+x, my+y)
 			case 4:
-				path[i] = FeuFollet(cur.table, long, large, mx+x, my+y)
+				path[i] = FeuFollet(cur.table, long, large, mx+x, my+y, cur.objx, cur.objy)
 			case 5:
-				path[i] = IsWrong(cur.table, long, large, mx+x, my+y)
+				path[i] = Gollum(cur.table, long, large, mx+x, my+y, cur.objx, cur.objy)
 			case 6:
+				path[i] = IsWrong(cur.table, long, large, mx+x, my+y)
+			case 7:
 				path[i] = IsRight(cur.table, long, large, mx+x, my+y)
 			}
 
@@ -302,14 +304,8 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 				if tmpGy < 0 {
 					tmpGy *= -1
 				}
-				tmpG = Factorial(tmpGx + tmpGy)
+				tmpG = tmpGx + tmpGy
 			}
-			//tmpGx = (gx - x) * (gx - x)
-			//tmpGy = (gy - y) * (gy - y)
-			//tmpG = int(math.Sqrt(float64(tmpGx + tmpGy)))
-
-			//tmpH = res.table[x][y] - ((x + 1) + (y * large))
-			//res.h += tmpG * tmpH
 			res.h += tmpH + tmpG
 		}
 	}
@@ -317,12 +313,15 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 }
 
 //	*	*	Swamp Wisp
-func FeuFollet(cur [][]int, long, large, mx, my int) Tabl {
+func FeuFollet(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
 	res := InitTable(cur, mx, my)
 	var tmpH, tmpHx, tmpHy, tmpG, tmpGx, tmpGy, gx, gy int
 
 	tmpG, tmpGx, tmpGy = 0, 0, 0
 	gx, gy = MissPuzzle(cur, long, large)
+	if gx == ox && gy == oy {
+		ox, oy = -1, -1
+	}
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
 			tmpHx = ((res.table[x][y] - 1) / large) - x
@@ -334,7 +333,9 @@ func FeuFollet(cur [][]int, long, large, mx, my int) Tabl {
 				tmpHy = -1 * tmpHy
 			}
 			tmpH = tmpHx + tmpHy
-			if tmpH > 0 {
+			if tmpH > tmpG && (oy != -1 || ox != -1) {
+				tmpG = tmpH
+				ox, oy = x, y
 				tmpGx = gx - x
 				if tmpGx < 0 {
 					tmpGx *= -1
@@ -343,15 +344,55 @@ func FeuFollet(cur [][]int, long, large, mx, my int) Tabl {
 				if tmpGy < 0 {
 					tmpGy *= -1
 				}
-				//if tmpG == 0 || tmpG > tmpGx + tmpGy {
-				if tmpG < tmpGx + tmpGy {
+				/*if tmpG > tmpGx+tmpGy {
 					tmpG = tmpGx + tmpGy
+					ox, oy = x, y
+				}*/
+			}
+			res.h += tmpH
+		}
+	}
+	res.objx, res.objy = ox, oy
+	tmpG = tmpGx + tmpGy
+	res.h += tmpG
+	return res
+}
+
+//	*	*	Smeagol
+func Gollum(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
+	res := InitTable(cur, mx, my)
+	var tmpH, tmpHx, tmpHy, tmpG, tmpM, gx, gy int
+
+	tmpG, tmpM = 0, 0
+	gx, gy = MissPuzzle(cur, long, large)
+	if gx == ox && gy == oy {
+		ox, oy = -1, -1
+	}
+	for x := 0; x < long; x++ {
+		for y := 0; y < large; y++ {
+			tmpHx = ((res.table[x][y] - 1) / large) - x
+			if tmpHx < 0 {
+				tmpHx = -1 * tmpHx
+			}
+			tmpHy = ((res.table[x][y] - 1) % large) - y
+			if tmpHy < 0 {
+				tmpHy = -1 * tmpHy
+			}
+			tmpH = tmpHx + tmpHy
+			if tmpH > 0 && (oy != -1 || ox != -1) {
+				if tmpH > tmpM {
+					tmpM = tmpH
+				}
+				if tmpH < tmpG {
+					tmpG = tmpH
+					ox, oy = x, y
 				}
 			}
 			res.h += tmpH
 		}
 	}
-	res.h += Factorial(tmpG)
+	res.objx, res.objy = ox, oy
+	res.h += tmpM
 	return res
 }
 
