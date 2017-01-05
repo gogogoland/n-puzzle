@@ -89,8 +89,8 @@ func SetObjectifBoard(long, large int) [][]int {
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	if board == nil || long <= 0 || large <= 0 {
 		return nil
-	} else if algo < 0 || algo > 7 {
-		fmt.Println("Algo value should be between 0 and 7 both inclued.")
+	} else if algo < 0 || algo > 6 {
+		fmt.Println("Algo value should be between 0 and 6 both inclued.")
 		return nil
 	}
 	SaveSnail(board, long, large)
@@ -213,8 +213,6 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 				path[i] = Gollum(cur.table, long, large, mx+x, my+y, cur.objx, cur.objy)
 			case 6:
 				path[i] = IsWrong(cur.table, long, large, mx+x, my+y)
-			case 7:
-				path[i] = IsRight(cur.table, long, large, mx+x, my+y)
 			}
 
 			//	Save data
@@ -421,7 +419,7 @@ func Chebyshev(cur [][]int, long, large, mx, my int) Tabl {
 	return res
 }
 
-//	*	*	Number of incorrect case
+//	*	*	Number of incorrect box
 func IsWrong(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
 
@@ -429,20 +427,6 @@ func IsWrong(cur [][]int, long, large, mx, my int) Tabl {
 		for y := 0; y < large; y++ {
 			if res.table[x][y] != cur[x][y] {
 				res.h++
-			}
-		}
-	}
-	return res
-}
-
-//	*	*	Number of correct case
-func IsRight(cur [][]int, long, large, mx, my int) Tabl {
-	res := InitTable(cur, mx, my)
-
-	for x := 0; x < long; x++ {
-		for y := 0; y < large; y++ {
-			if res.table[x][y] == cur[x][y] {
-				res.h--
 			}
 		}
 	}
