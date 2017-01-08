@@ -26,7 +26,11 @@ func (h PrioQueue) Len() int {
 }
 
 func (h PrioQueue) Less(i, j int) bool {
-	return h[i].rang < h[j].rang
+	if h[i].h != h[j].h {
+		return h[i].h < h[j].h
+	} else {
+		return h[i].rang < h[j].rang
+	}
 }
 
 func (h PrioQueue) Swap(i, j int) {
@@ -107,6 +111,7 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	for len(*open) > 0 {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
+		//fmt.Println("Current: {deep:", cur.(Tabl).g, ", heuristic:", cur.(Tabl).h)
 
 		//	Push current in close list (or Init close list with)
 		heap.Push(close, cur)
@@ -219,7 +224,7 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 			id++
 			path[i].cur, path[i].from = id, cur.cur
 			path[i].g = cur.g + 1
-			path[i].rang = cur.h + path[i].h
+			path[i].rang = path[i].h + path[i].g
 			path[i].x, path[i].y = mx+x, my+y
 
 			//	Reswitch place
@@ -238,6 +243,9 @@ func Manahttan(cur [][]int, long, large, mx, my int) Tabl {
 
 	for x = 0; x < long; x++ {
 		for y = 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
 			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
@@ -259,6 +267,9 @@ func Euclidien(cur [][]int, long, large, mx, my int) Tabl {
 
 	for x = 0; x < long; x++ {
 		for y = 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
 			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
@@ -284,6 +295,9 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 	gx, gy = MissPuzzle(cur, long, large)
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
 			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
@@ -322,6 +336,9 @@ func FeuFollet(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
 	}
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
 			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
@@ -368,6 +385,9 @@ func Gollum(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
 	}
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
 			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
@@ -401,6 +421,9 @@ func Chebyshev(cur [][]int, long, large, mx, my int) Tabl {
 
 	for x = 0; x < long; x++ {
 		for y = 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
 			tmpHx = ((res.table[x][y] - 1) / large) - x
 			if tmpHx < 0 {
 				tmpHx = -1 * tmpHx
@@ -425,6 +448,9 @@ func IsWrong(cur [][]int, long, large, mx, my int) Tabl {
 
 	for x := 0; x < long; x++ {
 		for y := 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
 			if res.table[x][y] != cur[x][y] {
 				res.h++
 			}
