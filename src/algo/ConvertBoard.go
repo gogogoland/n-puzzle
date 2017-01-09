@@ -12,6 +12,8 @@
 
 package algo
 
+import "fmt"
+
 var (
 	obv   int
 	snail []int
@@ -63,7 +65,6 @@ func SaveSnail(board [][]int, long, large int) {
 	}
 	i--
 	obv = right[i]
-	deepmax = long * large * long * large * 2
 }
 
 //	*	ConvertBoard from snail to right
@@ -120,6 +121,11 @@ func CheckSolvability(board [][]int, long, large int) [][]int {
 	final = SetObjectifBoard(long, large)
 	ConvertToSnail(final, long, large)
 	if CheckInversion(BoardToString(board, long, large)) == CheckInversion(BoardToString(final, long, large)) {
+		ConvertToRight(final, long, large)
+		return final
+	} else {
+		//TODO Check (Inversion final) != (Inversion first) even if it's solvable
+		fmt.Println("TODOCheck inversion 1 :", CheckInversion(BoardToString(board, long, large)), "check inversion 2 :", CheckInversion(BoardToString(final, long, large)))
 		ConvertToRight(final, long, large)
 		return final
 	}

@@ -72,9 +72,8 @@ func PrintAll(pr Tabl, long, large int) {
 }
 
 //	Functions A*
-
 //	*	Implementation of A*
-func Pathfinding(board [][]int, long, large, algo int) *list.List {
+func Pathfinding(board [][]int, long, large, algo, deep int) *list.List {
 	if board == nil || long <= 0 || large <= 0 {
 		return nil
 	} else if algo < 0 || algo > 6 {
@@ -87,6 +86,7 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 		fmt.Println("There are no solution")
 		return nil
 	}
+	deep = GetMaxDeep(long, large, deep)
 	ConvertToRight(board, long, large)
 	open := InitHeapList(board, long, large)
 	close := InitHeapList(objtf, long, large)
@@ -99,14 +99,15 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 	for len(*open) > 0 {
 		//	Get Highest priority of open
 		cur := heap.Pop(open)
-		//fmt.Println("Current: {deep:", cur.(Tabl).g, ", heuristic:", cur.(Tabl).h)
+
+		//fmt.Println("Current (", cur.(Tabl).cur, "): {deep:", cur.(Tabl).g, ", heuristic:", cur.(Tabl).h, "}")
 
 		//	Push current in close list (or Init close list with)
 		heap.Push(close, cur)
 		heap.Fix(close, len(*close)-1)
 
 		//	Find next path
-		tmp, id = AlgoAStar(cur.(Tabl), long, large, id, algo)
+		tmp, id = AlgoAStar(cur.(Tabl), long, large, id, algo, deep)
 		for i := 0; i < 4; i++ {
 			if tmp[i].rang > -1 {
 
@@ -119,22 +120,23 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 				if CompareTable(tmp[i], (*close)[0], long, large) {
 					elapsed := time.Since(start)
 					defer fmt.Println("Time required: ", elapsed)
-					return ListPath(long, large, tmp[i], *close)
+					return ListPath(long, large, tmp[i], *close, *open)
 				}
 			}
 		}
 	}
 	elapsed := time.Since(start)
 	fmt.Println("Binomial took ", elapsed)
+	fmt.Println("Number of case tested: ", len(*close), ", Number of case opened: ", len(*open)+len(*close), ", Number of case unchecked: ", len(*open))
 	fmt.Println("No solution founded")
 	return nil
 }
 
 //	Fill list with found path
-func ListPath(long, large int, tmp Tabl, close []Tabl) *list.List {
+func ListPath(long, large int, tmp Tabl, close, open []Tabl) *list.List {
 	var i, from int
 
-	defer fmt.Println("Number of case tested: ", len(close))
+	defer fmt.Println("Number of case tested:", len(close), ", Number of case opened:", len(open)+len(close), ", Number of case unchecked:", len(open))
 	defer PrintAll(tmp, long, large)
 
 	path := list.New()
@@ -145,12 +147,13 @@ func ListPath(long, large int, tmp Tabl, close []Tabl) *list.List {
 	for from != 0 {
 		i++
 		if close[i].cur == from {
+
+			defer PrintAll(close[i], long, large)
+
 			ConvertToSnail(close[i].table, long, large)
 			path.PushFront(Path{Ret: BoardToString(close[i].table, long, large)})
 			from = close[i].from
 			i = 0
-
-			defer PrintAll(close[i], long, large)
 		}
 	}
 	return path
@@ -175,13 +178,38 @@ func MissPuzzle(board [][]int, long, large int) (int, int) {
 	return x, y
 }
 
+//	*	Get max deep known or calcul it
+func GetMaxDeep(long, large, deep int) int {
+	deep *= long * large
+	if deep == 4 {
+		return 6
+	} else if deep == 6 {
+		return 21
+	} else if deep == 9 {
+		return 31
+	} else if deep == 8 {
+		return 36
+	} else if deep == 12 {
+		return 53
+	} else if deep == 16 {
+		return 80
+	} else if deep == 25 {
+		return 152
+	} else if deep > 0 {
+		return deep*(BoolToInt(long > large)*(long+1)+BoolToInt(large >= long)*large+1) + BoolToInt(long < large)*(long+1) + BoolToInt(large <= long)*(large+1)
+	} else {
+		return deep
+	}
+}
+
 //	*	Algorithme
-func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
+func AlgoAStar(cur Tabl, long, large, id, algo, deep int) ([4]Tabl, int) {
 	var path [4]Tabl
 	mx := 0
 	my := 0
 
 	mx, my = cur.x, cur.y
+	//	For each direction
 	for i := 0; i < 4; i++ {
 		x := (i - 2) % 2
 		y := (i - 1) % 2
@@ -212,7 +240,8 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 			id++
 			path[i].cur, path[i].from = id, cur.cur
 			path[i].g = cur.g + 1
-			if path[i].g > deepmax {
+			//	Do not save if too deep
+			if deep > 0 && path[i].g > deep {
 				path[i].rang = -1
 			} else {
 				path[i].rang = path[i].h + path[i].g
@@ -222,13 +251,14 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 			//	Reswitch place
 			cur.table[mx+x][my+y], cur.table[mx][my] = cur.table[mx][my], cur.table[mx+x][my+y]
 		} else {
+			//	Unauthorized move
 			path[i].rang = -1
 		}
 	}
 	return path, id
 }
 
-//	*	*	Manahttan
+//	*	*	0:Manahttan
 func Manahttan(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
 	var tmpHx, tmpHy, x, y int
@@ -252,7 +282,7 @@ func Manahttan(cur [][]int, long, large, mx, my int) Tabl {
 	return res
 }
 
-//	*	*	Euclidien
+//	*	*	1:Euclidien
 func Euclidien(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
 	var tmpHx, tmpHy, tmpH, x, y int
@@ -271,14 +301,43 @@ func Euclidien(cur [][]int, long, large, mx, my int) Tabl {
 				tmpHy = -1 * tmpHy
 			}
 			//tmpH = (tmpHx + tmpHy) * (tmpHy + tmpHx)
-			tmpH = (tmpHx * tmpHx) + (tmpHy + tmpHy)
+			tmpH = (tmpHx * tmpHx) + (tmpHy * tmpHy)
 			res.h += int(math.Sqrt(float64(tmpH)))
 		}
 	}
 	return res
 }
 
-//	*	*	Marecages
+//	*	*	2:Chebyshev
+func Chebyshev(cur [][]int, long, large, mx, my int) Tabl {
+	res := InitTable(cur, mx, my)
+	var tmpHx, tmpHy, x, y int
+
+	for x = 0; x < long; x++ {
+		for y = 0; y < large; y++ {
+			if res.table[x][y] == obv {
+				continue
+			}
+			tmpHx = ((res.table[x][y] - 1) / large) - x
+			if tmpHx < 0 {
+				tmpHx = -1 * tmpHx
+			}
+			tmpHy = ((res.table[x][y] - 1) % large) - y
+			if tmpHy < 0 {
+				tmpHy = -1 * tmpHy
+			}
+			if tmpHx > tmpHy {
+				res.h += tmpHx
+			} else {
+				res.h += tmpHy
+			}
+		}
+	}
+	return res
+}
+
+//	*	*	3:Marecages
+//	*	*	*	Get distance of blanck space + distance from objectif
 func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
 	var tmpH, tmpHx, tmpHy, tmpG, tmpGx, tmpGy, gx, gy int
@@ -316,7 +375,8 @@ func Marecages(cur [][]int, long, large, mx, my int) Tabl {
 	return res
 }
 
-//	*	*	Swamp Wisp
+//	*	*	4:Swamp Wisp
+//	*	*	*	Get direction of farthest box from his objectif using swamp calcul
 func FeuFollet(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
 	res := InitTable(cur, mx, my)
 	var tmpH, tmpHx, tmpHy, tmpG, tmpGx, tmpGy, gx, gy int
@@ -365,7 +425,8 @@ func FeuFollet(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
 	return res
 }
 
-//	*	*	Smeagol
+//	*	*	5:Smeagol
+//	*	*	*	Get direction of farthest box from blanck box using swamp calcul
 func Gollum(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
 	res := InitTable(cur, mx, my)
 	var tmpH, tmpHx, tmpHy, tmpG, tmpM, gx, gy int
@@ -406,35 +467,7 @@ func Gollum(cur [][]int, long, large, mx, my, ox, oy int) Tabl {
 	return res
 }
 
-//	*	*	Chebyshev
-func Chebyshev(cur [][]int, long, large, mx, my int) Tabl {
-	res := InitTable(cur, mx, my)
-	var tmpHx, tmpHy, x, y int
-
-	for x = 0; x < long; x++ {
-		for y = 0; y < large; y++ {
-			if res.table[x][y] == obv {
-				continue
-			}
-			tmpHx = ((res.table[x][y] - 1) / large) - x
-			if tmpHx < 0 {
-				tmpHx = -1 * tmpHx
-			}
-			tmpHy = ((res.table[x][y] - 1) % large) - y
-			if tmpHy < 0 {
-				tmpHy = -1 * tmpHy
-			}
-			if tmpHx > tmpHy {
-				res.h += tmpHx
-			} else {
-				res.h += tmpHy
-			}
-		}
-	}
-	return res
-}
-
-//	*	*	Number of incorrect box
+//	*	*	6:Number of incorrect box
 func IsWrong(cur [][]int, long, large, mx, my int) Tabl {
 	res := InitTable(cur, mx, my)
 
@@ -487,39 +520,4 @@ func IsWrong(cur [][]int, long, large, mx, my int) Tabl {
 		;
 	}
 	return path
-}*/
-
-//	*	Check if the board is solvable
-/*func CheckSolvable(board [][]int, long, large, algo int) (bool, int) {
-	var cross, i, j, max, d_pos, d_crs, d_lrg int
-	var chain []int
-
-	d_pos, cross = MissPuzzle(board, long, large)
-	cross = 0
-	max = long * large
-	chain = BoardToString(board, long, large)
-	for i = 0; i < max; i++ {
-		if chain[i] == obv {
-			d_pos = d_pos - (i / large)
-		}
-		for j = i + 1; j < max; j++ {
-			if chain[j] < chain[i] {
-				cross++
-			}
-		}
-	}
-	if cross == 0 {
-		fmt.Println("Already finished. Come on, Test me !")
-		return true, 0
-	}
-	d_lrg = large % 2
-	d_crs = cross % 2
-	d_pos = d_pos % 2 * d_pos % 2
-	fmt.Println("d_l=", d_lrg, "d_c=", d_crs, "d_p=", d_pos, "cross=", cross)
-	if (d_lrg == 1 && d_crs == 0) || (d_lrg == 0 && d_pos == d_crs) {
-		fmt.Println("No solution")
-		return false, cross
-	}
-	fmt.Println("Is soluble. .. I hope.")
-	return true, cross
 }*/

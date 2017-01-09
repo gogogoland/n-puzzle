@@ -16,26 +16,37 @@ import (
 	"ui"
 )
 
-func CheckArgs() (int, int) {
-	//check if 2 args
-	if len(os.Args) != 3 {
-		fmt.Println("[Usage]:", os.Args[0], "<file of puzzle> -[your algo]")
-		return 1, 0
+func CheckArgs() (int, int, int) {
+	var limit int
+	//check if 2 or 3 args
+	if len(os.Args) < 3 || len(os.Args) > 4 {
+		fmt.Println("[Usage]:", os.Args[0], "<file of puzzle> -[your algo] [-d/-deep/-deepness]")
+		return 1, 0, 0
 	}
 
 	//Open file and check if exist.
 	file, err := os.Stat(os.Args[1])
 	if err != nil || file.IsDir() {
 		fmt.Println("[ERROR]: Can't open your File/Directory.")
-		return 1, 0
+		return 1, 0, 0
 	}
 
 	input, err := strconv.Atoi(string(os.Args[2]))
 	if err != nil {
 		fmt.Println("[ERROR]: Atoi failed for somes obscurs reasons...")
-		return 1, 0
+		return 1, 0, 0
 	}
-	return 0, input
+	limit = 0
+	if len(os.Args) == 4 {
+		if os.Args[3] != "-d" && os.Args[3] != "-deep" && os.Args[3] != "-deepness" {
+			fmt.Println("[Undefined]:", os.Args[3], "should be blanck or [-d/-deep/-deepness]")
+			return 1, 0, 0
+		}
+		limit = 1
+	} else {
+		limit = 0
+	}
+	return 0, input, limit
 }
 
 //	Read file line by line
@@ -184,13 +195,13 @@ func CheckData(tabl [][]int, long, large int) bool {
 }
 
 func main() {
-	err, AlGore := CheckArgs()
+	err, AlGore, LimDeep := CheckArgs()
 
 	if err == 0 {
 		board, long, large := ReadFile()
 		if board == nil || long < 1 || large < 1 {
 		}
-		array := algo.Pathfinding(board, long, large, AlGore)
+		array := algo.Pathfinding(board, long, large, AlGore, LimDeep)
 		ui.Ui(array, long, large)
 		return
 	}
