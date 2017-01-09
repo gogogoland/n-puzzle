@@ -72,22 +72,6 @@ func PrintAll(pr Tabl, long, large int) {
 }
 
 //	Functions A*
-//	*	Set Waited board
-func SetObjectifBoard(long, large int) [][]int {
-	x, y, i := 0, 0, 1
-	var objtf = make([][]int, long)
-	for x < long {
-		objtf[x] = make([]int, large)
-		y = 0
-		for y < large {
-			objtf[x][y] = i
-			i++
-			y++
-		}
-		x++
-	}
-	return (objtf)
-}
 
 //	*	Implementation of A*
 func Pathfinding(board [][]int, long, large, algo int) *list.List {
@@ -98,8 +82,12 @@ func Pathfinding(board [][]int, long, large, algo int) *list.List {
 		return nil
 	}
 	SaveSnail(board, long, large)
+	objtf := CheckSolvability(board, long, large)
+	if objtf == nil {
+		fmt.Println("There are no solution")
+		return nil
+	}
 	ConvertToRight(board, long, large)
-	objtf := SetObjectifBoard(long, large)
 	open := InitHeapList(board, long, large)
 	close := InitHeapList(objtf, long, large)
 	var tmp [4]Tabl
@@ -224,7 +212,11 @@ func AlgoAStar(cur Tabl, long, large, id, algo int) ([4]Tabl, int) {
 			id++
 			path[i].cur, path[i].from = id, cur.cur
 			path[i].g = cur.g + 1
-			path[i].rang = path[i].h + path[i].g
+			if path[i].g > deepmax {
+				path[i].rang = -1
+			} else {
+				path[i].rang = path[i].h + path[i].g
+			}
 			path[i].x, path[i].y = mx+x, my+y
 
 			//	Reswitch place

@@ -63,6 +63,7 @@ func SaveSnail(board [][]int, long, large int) {
 	}
 	i--
 	obv = right[i]
+	deepmax = long * large * long * large * 2
 }
 
 //	*	ConvertBoard from snail to right
@@ -93,4 +94,52 @@ func BoardToString(board [][]int, long, large int) []int {
 		}
 	}
 	return ret
+}
+
+//	*	Set Waited board
+func SetObjectifBoard(long, large int) [][]int {
+	x, y, i := 0, 0, 1
+	var objtf = make([][]int, long)
+	for x < long {
+		objtf[x] = make([]int, large)
+		y = 0
+		for y < large {
+			objtf[x][y] = i
+			i++
+			y++
+		}
+		x++
+	}
+	return (objtf)
+}
+
+//	*	Check solvability by odd/even inversion for initial state and final state
+func CheckSolvability(board [][]int, long, large int) [][]int {
+	var final [][]int
+
+	final = SetObjectifBoard(long, large)
+	ConvertToSnail(final, long, large)
+	if CheckInversion(BoardToString(board, long, large)) == CheckInversion(BoardToString(final, long, large)) {
+		ConvertToRight(final, long, large)
+		return final
+	}
+	return nil
+}
+
+//	*	Check number of inversion
+func CheckInversion(check []int) bool {
+	var li, i, max, r int
+
+	i, li, r = 0, -1, 0
+	max = len(check)
+	for i < max {
+		if check[i] == li+1 {
+			check[i], check[li], i, li = check[li], check[i], li, -1
+			r++
+		} else if li < 0 && check[i] != i+1 {
+			li = i
+		}
+		i++
+	}
+	return ((r % 2) == 0)
 }
